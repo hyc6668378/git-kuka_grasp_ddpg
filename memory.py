@@ -1,3 +1,4 @@
+# coding=utf-8
 import numpy as np
 from baselines.common.segment_tree import SumSegmentTree, MinSegmentTree
 
@@ -25,9 +26,8 @@ class Memory(object):
         self.adding_demonstrations = False  # Whether the initial period of collecting demonstrations is done.
         self.num_demonstrations = 0  # Number of demo transitions in the buffer.
         self._total_transitions = 0  # Total number of collected transitions (should grow linearly)
-        self.total_transition_limit = self.nb_rollout_steps  # Limit on the rate of collecting new data.
         self.storable_elements = [
-             "obs0", "actions", "rewards", "obs1","full_states0", "full_states1", "terminals1"
+             "obs0", "actions", "rewards", "obs1", "full_states0", "full_states1", "terminals1"
         ]  # List of entities we want to store for each timestep.
 
     def __len__(self):
@@ -36,9 +36,6 @@ class Memory(object):
     @property
     def total_transitions(self):
         return self._total_transitions
-
-    def grow_limit(self):
-        self.total_transition_limit += self.nb_rollout_steps
 
     @property
     def nb_entries(self):
@@ -112,9 +109,8 @@ class PrioritizedMemory(Memory):
                  capacity,
                  alpha,
                  transition_small_epsilon=1e-6,
-                 demo_epsilon=0.2,
-                 nb_rollout_steps=100):
-        super(PrioritizedMemory, self).__init__(capacity, nb_rollout_steps)
+                 demo_epsilon=0.2):
+        super(PrioritizedMemory, self).__init__(capacity)
         assert alpha > 0
         self._alpha = alpha
         self._transition_small_epsilon = transition_small_epsilon
@@ -130,6 +126,7 @@ class PrioritizedMemory(Memory):
         idx = self._next_idx
         if not super().append(full_state0, obs0, action, reward, full_state1, obs1, terminal1):
             return
+        # 新加入的'transition'设置为最大优先级, 确保每一个'transition'都至少被采样一次
         self._it_sum[idx] = self._max_priority
         self._it_min[idx] = self._max_priority
 
@@ -142,6 +139,10 @@ class PrioritizedMemory(Memory):
         self.num_demonstrations += 1
 
     def _sample_proportional(self, batch_size, pretrain):
+        """
+        利用sum-tree快速根据优先级采样
+        :return: 返回采样索引res
+        """
         res = []
         if pretrain:
             res = np.random.random_integers(
@@ -162,6 +163,7 @@ class PrioritizedMemory(Memory):
         demos = [i < self.num_demonstrations for i in idxes]
         weights = []
         p_sum = self._it_sum.sum()
+        # 算重要性采样权重 weights
         for idx in idxes:
             p_sample = self._it_sum[idx] / p_sum
             weight = ((1.0 / p_sample) * (1.0 / len(self.storage)))**beta
