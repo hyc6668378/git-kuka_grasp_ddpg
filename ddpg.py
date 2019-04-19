@@ -59,8 +59,13 @@ class DDPG(object):
         self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=0.8)
         self.pointer = 0                        # memory 计数器　
         self.sess = tf.InteractiveSession()     # 创建一个默认会话
-        self.lambda_1step = 1.0                 # 1_step_return_loss的权重
-        self.lambda_nstep = 1.0                 # n_step_return_loss的权重
+        self.lambda_1step = 0.5                 # 1_step_return_loss的权重
+        self.lambda_nstep = 0.5                 # n_step_return_loss的权重
+
+        # check the td loss
+        self.n_step_td_loss_list = np.array([], dtype=np.float32)
+        self.one_step_td_loss_list = np.array([], dtype=np.float32)
+        self.L2_regular_list = np.array([], dtype=np.float32)
 
         # 定义 placeholders
         self.observe_Input = tf.placeholder(tf.float32, [None, 84, 84, 3], name='observe_Input')
@@ -107,7 +112,7 @@ class DDPG(object):
             # q(s_,a_) = critic_target(full_state_, action_)
             #          = critic_target(full_state_, actor_target(obs_))
             #          ---- paper 公式5
-            q_ = self.build_critic(self.normalized_state_, action_, scope='target', trainable=False)
+            q_ = self.build_critic(self.normalized_state_, self.action, scope='target', trainable=False)  # on-policy
 
         # Collect networks parameters. It would make it more easily to manage them.
         self.ae_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/eval')
@@ -129,9 +134,11 @@ class DDPG(object):
         self.td_error = tf.square(self.q_target - q)
         self.nstep_td_error = tf.square(self.n_step_target_q - q)
 
-        td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.td_error)) * self.lambda_1step
-        n_step_td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.nstep_td_error)) * self.lambda_nstep
-        critic_losses = td_losses + n_step_td_losses + tf.contrib.layers.apply_regularization(
+        self.td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.td_error)) * self.lambda_1step
+        self.n_step_td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.nstep_td_error)) * self.lambda_nstep
+        self.L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
+                                                                 weights_list=self.ce_params)
+        critic_losses = self.td_losses + self.n_step_td_losses + tf.contrib.layers.apply_regularization(
                                                                     tf.contrib.layers.l2_regularizer(0.001),
                                                                     weights_list=self.ce_params)
         # L_critic = lambda_1_step * L_1_step + lambda_n_step * L_n_step + lambda2
@@ -195,7 +202,7 @@ class DDPG(object):
         target_q_1step = self.sess.run(
             self.q_target,
             feed_dict={
-                self.observe_Input_: batch['obs1'],
+                self.observe_Input: batch['obs1'],
                 self.f_s_: batch['full_states1'],
                 self.R: batch['rewards'],
             })
@@ -204,11 +211,13 @@ class DDPG(object):
             feed_dict={ self.terminals1: n_step_batch["terminals1"],
                         self.n_step_steps: n_step_batch["step_reached"],
                         self.R: n_step_batch['rewards'],
-                        self.observe_Input_: n_step_batch['obs1'],
+                        self.observe_Input: n_step_batch['obs1'],
                         self.f_s_: n_step_batch['full_states1']})
         # calculate td_errors and grads of critic
-        td_error, nstep_td_error, critic_grads = self.sess.run(
-                [self.td_error, self.nstep_td_error, self.critic_grads],
+        td_error, nstep_td_error, critic_grads,\
+        td_losses, n_step_td_losses, L2_regular = self.sess.run(
+                [self.td_error, self.nstep_td_error, self.critic_grads,
+                 self.td_losses, self.n_step_td_losses, self.L2_regular],
                             feed_dict={
                                 self.q_target: target_q_1step,
                                 self.n_step_target_q: n_step_target_q,
@@ -216,6 +225,11 @@ class DDPG(object):
                                 self.action: batch['actions'],
                                 self.ISWeights: batch['weights']
                                 })
+        # check the td loss
+        self.n_step_td_loss_list = np.append(self.n_step_td_loss_list, n_step_td_losses)
+        self.one_step_td_loss_list = np.append(self.one_step_td_loss_list, td_losses)
+        self.L2_regular_list = np.append(self.L2_regular_list, L2_regular)
+
         # update critic
         self.critic_optimizers.update(critic_grads, stepsize=LR_C)
 
@@ -226,7 +240,7 @@ class DDPG(object):
         self.memory.update_priorities(batch['idxes'], td_errors=(td_error + nstep_td_error))
 
         # soft target replacement
-        self.sess.run(self.soft_replace_a)
+        # self.sess.run(self.soft_replace_a)  # on-policy
         self.sess.run(self.soft_replace_c)
 
     def store_transition(self,

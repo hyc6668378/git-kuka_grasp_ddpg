@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import inspect
-from pybullet_envs.bullet.kuka_diverse_object_gym_env import KukaDiverseObjectEnv
+from KukaGymEnv import KukaDiverseObjectEnv
 from gym import spaces
 from ddpg import DDPG
 
@@ -40,8 +40,8 @@ class ContinuousDownwardBiasPolicy(object):
     return np.array([dx, dy, dz, da])
 
 
-MEMORY_CAPACITY = 50000         # memory 容量
-MAX_EPISODES = 100000           # learn迭代次数
+MEMORY_CAPACITY = 50         # memory 容量
+MAX_EPISODES = 30000           # learn迭代次数
 MAX_EP_STEPS = 50               # 一个回合必须在100个steps内完成任务否则结束
 isRENDER = False                # 默认训练期间不渲染
 
@@ -107,7 +107,21 @@ def main():
     plt.ylabel('success rate')
     plt.show()
 
+    plt.plot(steps_list, ddpg_agent.n_step_td_loss_list, label='n_step_td_loss')
+    plt.plot(steps_list, ddpg_agent.one_step_td_loss_list, label='one_step_td_loss')
+    plt.plot(steps_list, ddpg_agent.L2_regular_list, label='L2_regular')
+
+    plt.title('critic loss check')
+    plt.legend()
+    plt.xlabel('train_Episode')
+    plt.ylabel('loss')
+    plt.show()
     ddpg_agent.Save()       # save the model
+    np.save("n_step_td_loss_list.npy", ddpg_agent.n_step_td_loss_list)
+    np.save("one_step_td_loss_list.npy", ddpg_agent.one_step_td_loss_list)
+    np.save("L2_regular_list.npy", ddpg_agent.L2_regular_list)
+    np.save("succ_list.npy", succ_list)
+    np.save("steps_list.npy", steps_list)
 
     print("learn success number:", learn_graspsuccess)
     print('Final success rate: %f ' % (learn_graspsuccess/MAX_EPISODES))
