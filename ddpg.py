@@ -44,10 +44,9 @@ class DDPG(object):
         # 定义 placeholders
         self.observe_Input = tf.placeholder(tf.float32, [None, 84, 84, 3], name='observe_Input')
         self.observe_Input_ = tf.placeholder(tf.float32, [None, 84, 84, 3], name='observe_Input_')
-        self.f_s = tf.placeholder(tf.float32, [None, 24], name='full_state_input')
-        self.f_s_ = tf.placeholder(tf.float32, [None, 24], name='fill_state_input_')
+        self.f_s = tf.placeholder(tf.float32, [None, 24], name='full_state_Input')
+        self.f_s_ = tf.placeholder(tf.float32, [None, 24], name='fill_state_Input_')
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
-        self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='nstep_reached')
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
 
         with tf.variable_scope('obs_rms'):
@@ -131,11 +130,13 @@ class DDPG(object):
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
                 self.f_s: batch['f_s0'],
+                self.f_s_: batch['f_s1'],
                 self.action: batch['actions']
             })
         self.critic_optimizer.update(critic_grads, stepsize=LR_C)
 
-        actor_grads = self.sess.run(self.actor_grads, {self.observe_Input: batch['obs0']})
+        actor_grads = self.sess.run(self.actor_grads, {self.observe_Input: batch['obs0'],
+                                                       self.f_s: batch['f_s0']})
         self.actor_optimizer.update(actor_grads, stepsize=LR_A)
 
         self.sess.run(self.soft_replace_a)

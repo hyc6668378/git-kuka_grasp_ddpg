@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/KukaGymEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/memory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,20 +15,33 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="25" column="33" lean-forward="true" selection-start-line="25" selection-start-column="33" selection-end-line="25" selection-end-column="33" />
-              <folding>
-                <element signature="e#15#24#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-704">
+              <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/memory.py">
+        <entry file="file://$PROJECT_DIR$/ddpg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
-              <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+            <state relative-caret-position="470">
+              <caret line="136" lean-forward="true" selection-start-line="136" selection-end-line="136" />
+              <folding>
+                <element signature="e#16#39#0" expanded="true" />
+                <element signature="e#538#612#0" />
+                <element signature="e#3863#4094#0" />
+                <element signature="e#4765#4940#0" />
+                <element signature="e#5005#5171#0" />
+                <element signature="e#5891#6014#0" />
+                <element signature="e#6044#6124#0" />
+                <element signature="e#6154#6213#0" />
+                <element signature="e#7249#7961#0" />
+                <element signature="e#8049#9341#0" />
+                <element signature="e#8313#9341#0" />
+                <element signature="e#9180#9202#0" />
+                <element signature="e#9423#10005#0" />
+                <element signature="e#9632#10005#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -53,9 +62,9 @@
         <option value="$PROJECT_DIR$/enjoy_kuka_diverse_object_grasping.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/memory.py" />
-        <option value="$PROJECT_DIR$/ddpg.py" />
         <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/KukaGymEnv.py" />
+        <option value="$PROJECT_DIR$/ddpg.py" />
       </list>
     </option>
   </component>
@@ -71,7 +80,17 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="git-kuka_grasp_ddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="git-kuka_grasp_ddpg" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -207,13 +226,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/OUNoise.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="6" column="55" selection-start-line="6" selection-start-column="48" selection-end-line="6" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/numpy/core/fromnumeric.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
@@ -238,30 +250,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg.py">
+    <entry file="file://$PROJECT_DIR$/OUNoise.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="90" lean-forward="true" selection-start-line="90" selection-end-line="90" />
-          <folding>
-            <element signature="e#16#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="25" column="33" lean-forward="true" selection-start-line="25" selection-start-column="33" selection-end-line="25" selection-end-column="33" />
-          <folding>
-            <element signature="e#15#24#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="115">
+          <caret line="6" column="55" selection-start-line="6" selection-start-column="48" selection-end-line="6" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/memory.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+        <state relative-caret-position="538">
+          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-704">
+          <caret line="3" selection-start-line="3" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="470">
+          <caret line="136" lean-forward="true" selection-start-line="136" selection-end-line="136" />
+          <folding>
+            <element signature="e#16#39#0" expanded="true" />
+            <element signature="e#538#612#0" />
+            <element signature="e#3863#4094#0" />
+            <element signature="e#4765#4940#0" />
+            <element signature="e#5005#5171#0" />
+            <element signature="e#5891#6014#0" />
+            <element signature="e#6044#6124#0" />
+            <element signature="e#6154#6213#0" />
+            <element signature="e#7249#7961#0" />
+            <element signature="e#8049#9341#0" />
+            <element signature="e#8313#9341#0" />
+            <element signature="e#9180#9202#0" />
+            <element signature="e#9423#10005#0" />
+            <element signature="e#9632#10005#0" />
+          </folding>
         </state>
       </provider>
     </entry>
