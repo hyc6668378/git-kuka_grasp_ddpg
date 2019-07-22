@@ -27,13 +27,12 @@ LR_A = 0.0001       # learning rate for actor
 LR_C = 0.001        # learning rate for critic
 GAMMA = 0.99        # reward discount
 TAU = 0.001         # soft replacement
-BATCH_SIZE = 32     # memory batch_size in training
-N_STEP_RETURN = 5   # N steps return for TD(N) error
 
 # -----------------------------  DDPG ---------------------------------------------
 
 class DDPG(object):
-    def __init__(self, memory_capacity):
+    def __init__(self, memory_capacity, batch_size):
+        self.batch_size = batch_size
         self.memory = Memory(limit=memory_capacity, action_shape=(4,),
                              observation_shape=(84, 84, 3),
                              full_state_shape=(24, ))
@@ -50,7 +49,6 @@ class DDPG(object):
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
         self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='nstep_reached')
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
-        self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
 
         with tf.variable_scope('obs_rms'):
             self.obs_rms = RunningMeanStd(shape=(84, 84, 3))
@@ -87,7 +85,7 @@ class DDPG(object):
             self.td_error = tf.abs(self.q_target - q)
             self.L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                      weights_list=self.ce_params)
-            critic_losses = tf.reduce_mean(tf.multiply(self.ISWeights, tf.square(self.td_error))) + self.L2_regular
+            critic_losses = tf.reduce_mean(tf.square(self.td_error)) + self.L2_regular
         with tf.variable_scope('Actor_lose'):
             a_loss = - tf.reduce_mean(q)
 
@@ -126,15 +124,14 @@ class DDPG(object):
         self.saver.restore(self.sess, save_path="model/model.ckpt")
 
     def learn(self):
-        batch = self.memory.sample( batch_size=BATCH_SIZE )
+        batch = self.memory.sample( batch_size=self.batch_size )
         critic_grads, td_error = self.sess.run(
             [self.critic_grads, self.td_error], feed_dict={
                 self.observe_Input_: batch['obs1'],
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
                 self.f_s: batch['f_s0'],
-                self.action: batch['actions'],
-                self.ISWeights: batch['weights']
+                self.action: batch['actions']
             })
         self.critic_optimizer.update(critic_grads, stepsize=LR_C)
 

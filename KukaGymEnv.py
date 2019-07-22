@@ -9,8 +9,6 @@ import pybullet as p
 import kuka
 import numpy as np
 import pybullet_data
-import pdb
-import distutils.dir_util
 import glob
 from pkg_resources import parse_version
 import gym
@@ -159,7 +157,7 @@ class KukaDiverseObjectEnv(Kuka):
             full_state = np.hstack((full_state, np.array(pos), np.array(ori)))
         # full_state += end_effector(pos,ori) + gripper(pos,ori)
         full_state = np.hstack((full_state, self._kuka.getObservation()))
-        # full_state.shape = (24,0)
+        # full_state.shape = (24,)
 
         return full_state
 
@@ -194,6 +192,7 @@ class KukaDiverseObjectEnv(Kuka):
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+
     def _get_observation(self):
         """Return the observation as an image.
         """

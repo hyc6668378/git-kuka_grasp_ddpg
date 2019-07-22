@@ -6,16 +6,23 @@ from OUNoise import OUNoise
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+import argparse
 
-MEMORY_CAPACITY = 20197         # memory 容量
-max_ep_steps = 50               # 一个回合必须在100个steps内完成任务否则结束
-isRENDER = False                # 默认训练期间不渲染
-Inter_Learn_Steps = 5
+parser = argparse.ArgumentParser()
+parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
+parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
+parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
+parser.add_argument('--batch_size',    type=int, default=128, help="batch_size. default = 128")
+parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
+parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
+args = parser.parse_args()
 
-ddpg_agent = DDPG(memory_capacity=MEMORY_CAPACITY)  # 初始化一个DDPG智能体
-env = KukaDiverseObjectEnv(renders=isRENDER,
+
+ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size)  # 初始化一个DDPG智能体
+env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
-                           maxSteps=max_ep_steps,
+                           maxSteps=args.max_ep_steps,
                            removeHeightHack=True,
                            numObjects=3, dv=1.0)
 
@@ -32,28 +39,21 @@ def plot(succ_list, steps_list):
 
     plt.figure(figsize=(21, 11))
     plt.ylim((0, 100))
-    plt.plot(steps_list, succ_list, label='DDPG')
-    plt.title('asymmetric_AC ')
+    plt.plot(steps_list, succ_list, label='success_rate')
+    plt.title(args.experiment_name)
     plt.legend()
     plt.xlabel('train_Episode')
     plt.ylabel('success rate')
-    plt.show()
-
-
-    plt.title('critic loss check')
-    plt.legend()
-    plt.xlabel('train_Episode')
-    plt.ylabel('loss')
-    plt.savefig('result/asymmetric_AC.png')
+    plt.savefig('result/'+args.experiment_name+'.png')
 
 def train(max_episodes):
     succ_list = np.array([])  # the succession rate list
     steps_list = np.array([])  # step counter
     learn_graspsuccess = 0.0
-    for i in range(max_episodes):
+    for i in tqdm(range(max_episodes)):
         obs0, done = env.reset(), False
         f_s0 = env.get_full_state()
-        for j in range(max_ep_steps):
+        for j in range(args.max_ep_steps):
 
             action = ddpg_agent.choose_action(obs0)
             action = Noise_Action(action)
@@ -74,8 +74,8 @@ def train(max_episodes):
             if info['grasp_success'] == 1:  # 探索阶段 抓取成功 计数器加1
                 learn_graspsuccess += 1
 
-            if ddpg_agent.pointer > MEMORY_CAPACITY:
-                for _ in range(Inter_Learn_Steps):
+            if ddpg_agent.pointer > args.memory_size:
+                for _ in range(args.inter_learn_steps):
                     ddpg_agent.learn()
             if done:  # done 指的是尝试完抓取 或者 达到最大steps
                 break
@@ -84,7 +84,6 @@ def train(max_episodes):
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
 
         if i % 500 == 0:
-            print("%d episodes after,success rate: %f " % (i, learn_graspsuccess / 500))
             succ_list = np.append(succ_list, learn_graspsuccess / 5)
             steps_list = np.append(steps_list,i)
             learn_graspsuccess = 0.
@@ -93,14 +92,14 @@ def train(max_episodes):
 def main():
     t1 = time.time()
     os.system("clear")
-    succ_list, steps_list = train(max_episodes=30000)
+    succ_list, steps_list = train(max_episodes=20000)
 
     plot(succ_list, steps_list)
 
     ddpg_agent.Save()       # save the model
 
-    np.save("result/succ_list.npy", succ_list)
-    np.save("result/steps_list.npy", steps_list)
+    np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
+    np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
 
     print('total Running time: ', (time.time() - t1)/3600.)
 
