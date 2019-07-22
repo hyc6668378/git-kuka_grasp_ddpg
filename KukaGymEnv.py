@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from pybullet_envs.bullet.kukaGymEnv import KukaGymEnv
+from kuka import Kuka
 import random
 import os
 from gym import spaces
@@ -14,9 +14,10 @@ import distutils.dir_util
 import glob
 from pkg_resources import parse_version
 import gym
+from gym.utils import seeding
 
 
-class KukaDiverseObjectEnv(KukaGymEnv):
+class KukaDiverseObjectEnv(Kuka):
     """Class for Kuka environment with diverse objects.
 
     In each episode some objects are chosen from a set of 1000 diverse objects.
@@ -93,7 +94,7 @@ class KukaDiverseObjectEnv(KukaGymEnv):
             p.resetDebugVisualizerCamera(1.3, 180, -41, [0.52, -0.2, -0.33])
         else:
             self.cid = p.connect(p.DIRECT)
-        self._seed()
+        self.seed()
 
         if (self._isDiscrete):
             if self._removeHeightHack:
@@ -190,6 +191,9 @@ class KukaDiverseObjectEnv(KukaGymEnv):
                 p.stepSimulation()
         return objectUids
 
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
     def _get_observation(self):
         """Return the observation as an image.
         """
