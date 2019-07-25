@@ -33,8 +33,8 @@ class KukaDiverseObjectEnv(Kuka):
                  removeHeightHack=False,
                  blockRandom=0.3,
                  cameraRandom=0,
-                 width=84,
-                 height=84,
+                 width=224,
+                 height=224,
                  numObjects=5,
                  isTest=False):
         """Initializes the KukaDiverseObjectEnv.
@@ -311,10 +311,10 @@ class KukaDiverseObjectEnv(Kuka):
         return observation, reward, done, debug
 
     def _reward(self):
-        """Calculates the reward for the episode.
-
-        The reward is 1 if one of the objects is above height .2 at the end of the
-        episode.
+        """
+        gripper out of range   -1
+        grasp success          +5
+        other                   0
         """
         state = p.getLinkState(self._kuka.kukaUid,
                                self._kuka.kukaEndEffectorIndex)
@@ -341,13 +341,13 @@ class KukaDiverseObjectEnv(Kuka):
             # If any block is above height, provide reward.
             if pos[2] > 0.2:
                 self._graspSuccess += 1
-                reward = 1
+                reward = 5
                 break
         return reward
 
     def _termination(self):
         """Terminates the episode if we have tried to grasp or if we are above
-        maxSteps steps.
+        maxSteps steps or gripper out of range.
         """
         return self._attempted_grasp or (self._env_step >= self._maxSteps) or self.out_of_range
 

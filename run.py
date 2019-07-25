@@ -8,13 +8,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import argparse
-
+import tensorflow as tf
+import random
 parser = argparse.ArgumentParser()
 parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
 parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
 parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
 parser.add_argument('--batch_size',    type=int, default=128, help="batch_size. default = 128")
 parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
+parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
 parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
 args = parser.parse_args()
 
@@ -27,6 +29,17 @@ env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            numObjects=3, dv=1.0)
 
 Noise = OUNoise(size=4, mu=0, theta=0.05, sigma=0.25)
+
+def set_global_seeds(myseed):
+
+    tf.set_random_seed(myseed)
+    np.random.seed(myseed)
+    random.seed(myseed)
+
+def save_all(succ_list, steps_list):
+    ddpg_agent.Save()  # save the model
+    np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
+    np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
 
 def Noise_Action(action):
     noise = Noise.sample()
@@ -87,20 +100,18 @@ def train(max_episodes):
             succ_list = np.append(succ_list, learn_graspsuccess / 5)
             steps_list = np.append(steps_list,i)
             learn_graspsuccess = 0.
+            save_all(succ_list, steps_list)
     return succ_list, steps_list
 
 def main():
     t1 = time.time()
     os.system("clear")
-    succ_list, steps_list = train(max_episodes=20000)
+    set_global_seeds(args.seed)
+    succ_list, steps_list = train(max_episodes=10000)
+
+    save_all(succ_list, steps_list)
 
     plot(succ_list, steps_list)
-
-    ddpg_agent.Save()       # save the model
-
-    np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
-    np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
-
     print('total Running time: ', (time.time() - t1)/3600.)
 
 if __name__ == '__main__':
