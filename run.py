@@ -63,7 +63,7 @@ def train(max_episodes):
     succ_list = np.array([])  # the succession rate list
     steps_list = np.array([])  # step counter
     learn_graspsuccess = 0.0
-    for i in tqdm(range(max_episodes)):
+    for i in range(max_episodes):
         obs0, done = env.reset(), False
         f_s0 = env.get_full_state()
         for j in range(args.max_ep_steps):
@@ -96,17 +96,19 @@ def train(max_episodes):
         Noise.theta = np.linspace(0.05, 0.0, max_episodes)[i]
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
 
-        if i % 500 == 0:
-            succ_list = np.append(succ_list, learn_graspsuccess / 5)
+        if i % 50 == 0:
+            succ_list = np.append(succ_list, learn_graspsuccess)
             steps_list = np.append(steps_list,i)
+            print("episode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
             learn_graspsuccess = 0.
             save_all(succ_list, steps_list)
     return succ_list, steps_list
 
 def main():
     t1 = time.time()
-    os.system("clear")
     set_global_seeds(args.seed)
+    os.system("clear")
+
     succ_list, steps_list = train(max_episodes=10000)
 
     save_all(succ_list, steps_list)

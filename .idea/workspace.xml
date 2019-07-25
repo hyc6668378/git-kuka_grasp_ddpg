@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/KukaGymEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
@@ -18,42 +17,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="55">
-              <caret line="61" column="14" selection-start-line="61" selection-start-column="14" selection-end-line="61" selection-end-column="14" />
+            <state relative-caret-position="469">
+              <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
               <folding>
                 <element signature="e#15#24#0" expanded="true" />
-                <element signature="e#1302#1513#0" />
-                <element signature="e#1553#1833#0" />
-                <element signature="e#2164#3101#0" />
-                <element signature="e#2950#3028#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-596">
-              <caret line="170" lean-forward="true" selection-start-line="170" selection-end-line="170" />
-              <folding>
-                <element signature="e#16#39#0" expanded="true" />
-                <element signature="e#538#612#0" />
-                <element signature="e#2286#2543#0" />
-                <element signature="e#2604#2737#0" />
-                <element signature="e#2792#2992#0" />
-                <element signature="e#3048#3241#0" />
-                <element signature="e#3769#4000#0" />
-                <element signature="e#4060#4469#0" />
-                <element signature="e#4911#5077#0" />
-                <element signature="e#5797#5920#0" />
-                <element signature="e#5950#6030#0" />
-                <element signature="e#6060#6119#0" />
-                <element signature="e#6150#6995#0" />
-                <element signature="e#6313#6605#0" />
-                <element signature="e#6728#6843#0" />
-                <element signature="e#7277#7989#0" />
-                <element signature="e#9208#9230#0" />
+                <element signature="e#1772#1983#0" />
+                <element signature="e#2023#2303#0" />
               </folding>
             </state>
           </provider>
@@ -75,17 +44,17 @@
         <option value="$PROJECT_DIR$/enjoy_kuka_diverse_object_grasping.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/memory.py" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/KukaGymEnv.py" />
         <option value="$PROJECT_DIR$/ddpg.py" />
+        <option value="$PROJECT_DIR$/run.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1984" />
-    <option name="y" value="-4" />
-    <option name="width" value="1857" />
-    <option name="height" value="1085" />
+    <option name="x" value="2609" />
+    <option name="y" value="108" />
+    <option name="width" value="1855" />
+    <option name="height" value="1084" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -143,7 +112,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
+    <frame x="1985" y="-4" width="1855" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.115720525" />
@@ -185,28 +154,28 @@
     <entry file="file://$PROJECT_DIR$/mpi_adam.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/training/saver.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/training/saver.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="309">
           <caret line="1252" column="30" selection-start-line="1252" selection-start-column="30" selection-end-line="1252" selection-end-column="30" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/__init__.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="28" column="41" selection-start-line="17" selection-end-line="28" selection-end-column="41" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/ops/gen_nn_ops.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/ops/gen_nn_ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
           <caret line="10422" column="13" selection-start-line="10422" selection-start-column="13" selection-end-line="10422" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/layers/core.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/layers/core.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
           <caret line="116" column="4" selection-start-line="116" selection-start-column="4" selection-end-line="116" selection-end-column="4" />
@@ -220,7 +189,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/numpy/core/fromnumeric.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/numpy/core/fromnumeric.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
           <caret line="1974" column="24" selection-start-line="1974" selection-start-column="19" selection-end-line="1974" selection-end-column="24" />
@@ -258,83 +227,104 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/layers/python/layers/layers.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/layers/python/layers/layers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="309">
           <caret line="1119" column="4" selection-start-line="1119" selection-start-column="4" selection-end-line="1119" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg.py">
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/KukaGymEnv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-596">
-          <caret line="170" lean-forward="true" selection-start-line="170" selection-end-line="170" />
+        <state relative-caret-position="115">
+          <caret line="17" column="33" selection-start-line="17" selection-start-column="33" selection-end-line="17" selection-end-column="33" />
           <folding>
-            <element signature="e#16#39#0" expanded="true" />
-            <element signature="e#538#612#0" />
-            <element signature="e#2286#2543#0" />
-            <element signature="e#2604#2737#0" />
-            <element signature="e#2792#2992#0" />
-            <element signature="e#3048#3241#0" />
-            <element signature="e#3769#4000#0" />
-            <element signature="e#4060#4469#0" />
-            <element signature="e#4911#5077#0" />
-            <element signature="e#5797#5920#0" />
-            <element signature="e#5950#6030#0" />
-            <element signature="e#6060#6119#0" />
-            <element signature="e#6150#6995#0" />
-            <element signature="e#6313#6605#0" />
-            <element signature="e#6728#6843#0" />
-            <element signature="e#7277#7989#0" />
-            <element signature="e#9208#9230#0" />
+            <element signature="e#303#14544#0" />
+            <element signature="e#303#509#1" />
+            <element signature="e#1027#3894#0" />
+            <element signature="e#1027#2309#1" />
+            <element signature="e#3104#3293#0" />
+            <element signature="e#3415#3569#0" />
+            <element signature="e#3596#3894#0" />
+            <element signature="e#3724#3894#0" />
+            <element signature="e#3926#5563#0" />
+            <element signature="e#5603#6072#0" />
+            <element signature="e#5697#5871#0" />
+            <element signature="e#6131#7113#0" />
+            <element signature="e#6131#6324#1" />
+            <element signature="e#6448#7087#0" />
+            <element signature="e#6927#6991#0" />
+            <element signature="e#7154#7222#0" />
+            <element signature="e#7264#7690#0" />
+            <element signature="e#7729#9168#0" />
+            <element signature="e#7729#8175#1" />
+            <element signature="e#8276#8848#0" />
+            <element signature="e#8412#8639#0" />
+            <element signature="e#8674#8848#0" />
+            <element signature="e#8876#9107#0" />
+            <element signature="e#8983#9033#0" />
+            <element signature="e#9068#9107#0" />
+            <element signature="e#9218#11958#0" />
+            <element signature="e#9218#9663#1" />
+            <element signature="e#10214#10469#0" />
+            <element signature="e#10362#10411#0" />
+            <element signature="e#10725#11720#0" />
+            <element signature="e#10793#11139#0" />
+            <element signature="e#11295#11679#0" />
+            <element signature="e#11851#11910#0" />
+            <element signature="e#11991#13238#0" />
+            <element signature="e#11991#12108#1" />
+            <element signature="e#12381#12426#0" />
+            <element signature="e#12515#12560#0" />
+            <element signature="e#12652#12697#0" />
+            <element signature="e#12779#13216#0" />
+            <element signature="e#12838#12960#0" />
+            <element signature="e#13144#13216#0" />
+            <element signature="e#13276#13502#0" />
+            <element signature="e#13276#13406#1" />
+            <element signature="e#13565#14433#0" />
+            <element signature="e#13565#13776#1" />
+            <element signature="e#14508#14544#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/KukaGymEnv.py">
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/summary/summary.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
+        <state relative-caret-position="239">
+          <caret line="376" column="4" selection-start-line="376" selection-start-column="4" selection-end-line="376" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/summary/writer/writer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="116" column="16" lean-forward="true" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="588">
+          <caret line="143" column="34" lean-forward="true" selection-start-line="143" selection-start-column="34" selection-end-line="143" selection-end-column="34" />
           <folding>
-            <element signature="e#303#509#1" />
-            <element signature="e#3102#3291#0" />
-            <element signature="e#3413#3567#0" />
-            <element signature="e#3594#3892#0" />
-            <element signature="e#3722#3892#0" />
-            <element signature="e#5601#6070#0" />
-            <element signature="e#5695#5869#0" />
-            <element signature="e#6129#7111#0" />
-            <element signature="e#6129#6322#1" />
-            <element signature="e#6446#7085#0" />
-            <element signature="e#6925#6989#0" />
-            <element signature="e#7152#7220#0" />
-            <element signature="e#7262#7688#0" />
-            <element signature="e#7727#9166#0" />
-            <element signature="e#7727#8173#1" />
-            <element signature="e#8410#8637#0" />
-            <element signature="e#8874#9105#0" />
-            <element signature="e#8981#9031#0" />
-            <element signature="e#9066#9105#0" />
-            <element signature="e#9216#9661#1" />
-            <element signature="e#10212#10467#0" />
-            <element signature="e#10360#10409#0" />
-            <element signature="e#10791#11137#0" />
-            <element signature="e#11293#11677#0" />
-            <element signature="e#11849#11908#0" />
+            <element signature="e#16#39#0" expanded="true" />
+            <element signature="e#8118#9976#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="55">
-          <caret line="61" column="14" selection-start-line="61" selection-start-column="14" selection-end-line="61" selection-end-column="14" />
+        <state relative-caret-position="469">
+          <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
           <folding>
             <element signature="e#15#24#0" expanded="true" />
-            <element signature="e#1302#1513#0" />
-            <element signature="e#1553#1833#0" />
-            <element signature="e#2164#3101#0" />
-            <element signature="e#2950#3028#0" />
+            <element signature="e#1772#1983#0" />
+            <element signature="e#2023#2303#0" />
           </folding>
         </state>
       </provider>

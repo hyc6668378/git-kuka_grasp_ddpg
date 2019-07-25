@@ -83,6 +83,7 @@ class DDPG(object):
             self.L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                      weights_list=self.ce_params)
             critic_losses = tf.reduce_mean(tf.square(self.td_error)) + self.L2_regular
+        tf.summary.scalar('critic_losses', critic_losses)
         with tf.variable_scope('Actor_lose'):
             a_loss = - tf.reduce_mean(q)
 
@@ -108,7 +109,8 @@ class DDPG(object):
         var_list = [var for var in tf.global_variables() if "moving" in var.name]
         var_list += tf.trainable_variables()
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
-        tf.summary.FileWriter("logs/", self.sess.graph)
+        self.writer = tf.summary.FileWriter("logs/", self.sess.graph)
+        self.merged_summary = tf.summary.merge_all()
 
     def choose_action(self, obs):
         obs = obs.astype(dtype=np.float32)
@@ -122,8 +124,8 @@ class DDPG(object):
 
     def learn(self):
         batch = self.memory.sample( batch_size=self.batch_size )
-        critic_grads, td_error = self.sess.run(
-            [self.critic_grads, self.td_error], feed_dict={
+        critic_grads, s = self.sess.run(
+            [self.critic_grads, self.merged_summary], feed_dict={
                 self.observe_Input_: batch['obs1'],
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
@@ -139,6 +141,7 @@ class DDPG(object):
 
         self.sess.run(self.soft_replace_a)
         self.sess.run(self.soft_replace_c)
+        self.writer.add_summary(s)
 
     def store_transition(self,
                          obs0,
