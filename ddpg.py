@@ -30,9 +30,11 @@ TAU = 0.005         # soft replacement
 # -----------------------------  DDPG ---------------------------------------------
 
 class DDPG(object):
-    def __init__(self, memory_capacity, batch_size, prioritiy, alpha=0.2):
+    def __init__(self, memory_capacity, batch_size, prioritiy, alpha=0.2, use_n_step=False, n_step_return=5):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
+        self.n_step_return = n_step_return
+        self.use_n_step = use_n_step
         if prioritiy:
             self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
         else:
@@ -53,6 +55,7 @@ class DDPG(object):
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
         self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
+        self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='n_step_reached')
 
         with tf.variable_scope('obs_rms'):
             self.obs_rms = RunningMeanStd(shape=(224, 224, 3))
@@ -64,16 +67,16 @@ class DDPG(object):
             self.normalized_observe_Input_ = tf.clip_by_value(
                 normalize(self.observe_Input_, self.obs_rms), -10., 10.)
         with tf.name_scope('state_preprocess'):
-            self.normalized_state = normalize(self.f_s, self.state_rms)
-            self.normalized_state_ = normalize(self.f_s_, self.state_rms)
+            self.normalized_f_s0 = normalize(self.f_s, self.state_rms)
+            self.normalized_f_s1 = normalize(self.f_s_, self.state_rms)
 
         with tf.variable_scope('Actor'):
             self.action = self.build_actor(self.normalized_observe_Input, scope='eval', trainable=True)
             self.action_ = self.build_actor(self.normalized_observe_Input_, scope='target', trainable=False)
 
         with tf.variable_scope('Critic'):
-            q = self.build_critic(self.normalized_state, self.action, scope='eval', trainable=True)
-            q_ = self.build_critic(self.normalized_state_, self.action_, scope='target', trainable=False)
+            q = self.build_critic(self.normalized_f_s0, self.action, scope='eval', trainable=True)
+            q_ = self.build_critic(self.normalized_f_s1, self.action_, scope='target', trainable=False)
 
         # Collect networks parameters. It would make it more easily to manage them.
         self.ae_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/eval')
@@ -86,10 +89,23 @@ class DDPG(object):
             self.soft_replace_c = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.ct_params, self.ce_params)]
         with tf.variable_scope('Critic_Lose'):
             self.q_target = self.R + (1. - self.terminals1) * GAMMA * q_
+
+            if self.use_n_step:
+                self.n_step_target_q = self.R + (1. - self.terminals1) * tf.pow(GAMMA, self.n_step_steps) * q_
             self.td_error = tf.abs(self.q_target - q)
-            self.L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
+
+            if self.use_n_step:
+                self.nstep_td_error = tf.abs(self.n_step_target_q - q)
+
+            L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                      weights_list=self.ce_params)
-            critic_losses = tf.reduce_mean(tf.multiply(self.ISWeights, tf.square(self.td_error))) + self.L2_regular
+            one_step_losse = tf.reduce_mean(tf.multiply(self.ISWeights, tf.square(self.td_error))) * self.lambda_1step
+
+            if self.use_n_step:
+                n_step_td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.nstep_td_error)) * self.lambda_nstep
+                critic_losses = one_step_losse + n_step_td_losses + L2_regular
+            else:
+                critic_losses = one_step_losse + L2_regular
 
         tf.summary.scalar('critic_losses', critic_losses)
         with tf.variable_scope('Actor_lose'):
@@ -133,20 +149,54 @@ class DDPG(object):
 
     def learn(self):
         if self.is_prioritiy:
-            batch = self.memory.sample(batch_size=self.batch_size, beta=self.beta)
+            batch, n_step_batch, percentage = self.memory.sample_rollout(
+                batch_size=self.batch_size,
+                nsteps=self.n_step_return,
+                beta=self.beta,
+                gamma=GAMMA
+            )
         else:
             batch = self.memory.sample(batch_size=self.batch_size)
 
-        critic_grads, td_error, s = self.sess.run(
-            [self.critic_grads, self.td_error, self.merged_summary], feed_dict={
+
+        target_q_1step = self.sess.run(
+            self.q_target,
+            feed_dict={
                 self.observe_Input_: batch['obs1'],
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
-                self.f_s: batch['f_s0'],
-                self.f_s_: batch['f_s1'],
-                self.action: batch['actions'],
-                self.ISWeights: batch['weights']
-            })
+                self.f_s_: batch['f_s1']
+                       })
+
+        if self.is_prioritiy and self.use_n_step:
+            n_step_target_q = self.sess.run(
+                self.n_step_target_q,
+                feed_dict={self.terminals1: n_step_batch["terminals1"],
+                           self.n_step_steps: n_step_batch["step_reached"],
+                           self.R:  n_step_batch['rewards'],
+                           self.observe_Input_: n_step_batch['obs1'],
+                           self.f_s_: n_step_batch['f_s1']
+                           })
+
+            td_error, critic_grads, s = self.sess.run(
+                [self.td_error, self.critic_grads, self.merged_summary],
+                feed_dict={
+                    self.q_target: target_q_1step,
+                    self.n_step_target_q: n_step_target_q,
+                    self.f_s: batch['f_s0'],
+                    self.action: batch['actions'],
+                    self.ISWeights: batch['weights']
+                })
+        else:
+            td_error, critic_grads, s = self.sess.run(
+                [self.td_error, self.critic_grads, self.merged_summary],
+                feed_dict={
+                    self.q_target: target_q_1step,
+                    self.f_s: batch['f_s0'],
+                    self.action: batch['actions'],
+                    self.ISWeights: batch['weights']
+                })
+
         self.critic_optimizer.update(critic_grads, stepsize=LR_C)
 
         actor_grads = self.sess.run(self.actor_grads, {self.observe_Input: batch['obs0'],

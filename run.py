@@ -23,6 +23,9 @@ def common_arg_parser():
     parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
     parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
     parser.add_argument("--turn_beta",  help="turn the beta from 0.6 to 1.0", action="store_true")
+    parser.add_argument("--use_n_step", help="use n_step_loss", action="store_true")
+    parser.add_argument('--n_step_return',    type=int, default=5, help="n step return. default = 5")
+
     return  parser
 
 parser = common_arg_parser()
@@ -30,7 +33,8 @@ args = parser.parse_args()
 
 
 ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
-                  prioritiy = args.priority, alpha = args.alpha)  # 初始化一个DDPG智能体
+                  prioritiy = args.priority, alpha = args.alpha,
+                  use_n_step = args.use_n_step ,n_step_return = args.n_step_return)  # 初始化一个DDPG智能体
 env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
                            maxSteps=args.max_ep_steps,
@@ -120,7 +124,7 @@ def main():
     set_global_seeds(args.seed)
     os.system("clear")
 
-    succ_list, steps_list = train(max_episodes=10000)
+    succ_list, steps_list = train(max_episodes=3000)
 
     save_all(succ_list, steps_list)
 

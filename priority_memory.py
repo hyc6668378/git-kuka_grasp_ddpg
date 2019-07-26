@@ -186,7 +186,7 @@ class PrioritizedMemory(Memory):
         n_step_batches["step_reached"] = []
         idxes = batches["idxes"]
         for idx in idxes:
-            local_idxes = list(range(idx, min(idx + nsteps, len(self))))
+            local_idxes = list(range(int(idx), int(min(idx + nsteps, len(self)))))
             transitions = self._get_batches_for_idxes(local_idxes)
             summed_reward = 0
             count = 0
