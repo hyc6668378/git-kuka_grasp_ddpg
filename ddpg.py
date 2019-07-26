@@ -3,6 +3,7 @@
 import tensorflow as tf
 import numpy as np
 from memory import Memory
+from priority_memory import PrioritizedMemory
 from mpi_running_mean_std import RunningMeanStd        # update the mean and std dynamically.
 import tensorflow.contrib as tc
 import tf_util as tf_util
@@ -24,20 +25,25 @@ def normalize(x, stats):
 LR_A = 0.0001       # learning rate for actor
 LR_C = 0.001        # learning rate for critic
 GAMMA = 0.99        # reward discount
-TAU = 0.001         # soft replacement
+TAU = 0.005         # soft replacement
 
 # -----------------------------  DDPG ---------------------------------------------
 
 class DDPG(object):
-    def __init__(self, memory_capacity, batch_size):
+    def __init__(self, memory_capacity, batch_size, prioritiy, alpha=0.2):
         self.batch_size = batch_size
-        self.memory = Memory(limit=memory_capacity, action_shape=(4,),
+        self.is_prioritiy = prioritiy
+        if prioritiy:
+            self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
+        else:
+            self.memory = Memory(limit=memory_capacity, action_shape=(4,),
                              observation_shape=(224, 224, 3),
                              full_state_shape=(24, ))
         self.pointer = 0                        # memory 计数器　
         self.sess = tf.InteractiveSession()     # 创建一个默认会话
         self.lambda_1step = 0.5                 # 1_step_return_loss的权重
         self.lambda_nstep = 0.5                 # n_step_return_loss的权重
+        self.beta = 0.6
 
         # 定义 placeholders
         self.observe_Input = tf.placeholder(tf.float32, [None, 224, 224, 3], name='observe_Input')
@@ -46,6 +52,7 @@ class DDPG(object):
         self.f_s_ = tf.placeholder(tf.float32, [None, 24], name='fill_state_Input_')
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
+        self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
 
         with tf.variable_scope('obs_rms'):
             self.obs_rms = RunningMeanStd(shape=(224, 224, 3))
@@ -82,7 +89,8 @@ class DDPG(object):
             self.td_error = tf.abs(self.q_target - q)
             self.L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                      weights_list=self.ce_params)
-            critic_losses = tf.reduce_mean(tf.square(self.td_error)) + self.L2_regular
+            critic_losses = tf.reduce_mean(tf.multiply(self.ISWeights, tf.square(self.td_error))) + self.L2_regular
+
         tf.summary.scalar('critic_losses', critic_losses)
         with tf.variable_scope('Actor_lose'):
             a_loss = - tf.reduce_mean(q)
@@ -117,27 +125,36 @@ class DDPG(object):
         return self.sess.run(self.action_, {self.observe_Input_: obs[np.newaxis, :]})[0]
 
     def Save(self):
+        # 只存权重,不存计算图.
         self.saver.save(self.sess, save_path="model/model.ckpt", write_meta_graph=False)
 
     def load(self):
         self.saver.restore(self.sess, save_path="model/model.ckpt")
 
     def learn(self):
-        batch = self.memory.sample( batch_size=self.batch_size )
-        critic_grads, s = self.sess.run(
-            [self.critic_grads, self.merged_summary], feed_dict={
+        if self.is_prioritiy:
+            batch = self.memory.sample(batch_size=self.batch_size, beta=self.beta)
+        else:
+            batch = self.memory.sample(batch_size=self.batch_size)
+
+        critic_grads, td_error, s = self.sess.run(
+            [self.critic_grads, self.td_error, self.merged_summary], feed_dict={
                 self.observe_Input_: batch['obs1'],
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
                 self.f_s: batch['f_s0'],
                 self.f_s_: batch['f_s1'],
-                self.action: batch['actions']
+                self.action: batch['actions'],
+                self.ISWeights: batch['weights']
             })
         self.critic_optimizer.update(critic_grads, stepsize=LR_C)
 
         actor_grads = self.sess.run(self.actor_grads, {self.observe_Input: batch['obs0'],
                                                        self.f_s: batch['f_s0']})
         self.actor_optimizer.update(actor_grads, stepsize=LR_A)
+
+        if self.is_prioritiy:
+            self.memory.update_priorities(batch['idxes'], td_errors=td_error)
 
         self.sess.run(self.soft_replace_a)
         self.sess.run(self.soft_replace_c)

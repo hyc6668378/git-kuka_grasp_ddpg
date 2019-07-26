@@ -2,8 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/memory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/M10000_10step_batch_64_steps_list.npy" beforeDir="false" afterPath="$PROJECT_DIR$/result/M10000_10step_batch_64_steps_list.npy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/M10000_10step_batch_64_succ_list.npy" beforeDir="false" afterPath="$PROJECT_DIR$/result/M10000_10step_batch_64_succ_list.npy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -12,18 +17,118 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DockManager">
+    <window id="2">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/priority_memory.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="-161">
+                    <caret line="25" column="20" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+                    <folding>
+                      <element signature="e#137#235#0" />
+                      <element signature="e#1037#1061#0" />
+                      <element signature="e#1118#1148#0" />
+                      <element signature="e#1198#1222#0" />
+                      <element signature="e#2414#2833#0" />
+                      <element signature="e#2424#2515#0" />
+                      <element signature="e#2552#2746#0" />
+                      <element signature="e#2878#3291#0" />
+                      <element signature="e#3336#3370#0" />
+                      <element signature="e#3572#4065#0" />
+                      <element signature="e#4993#5501#0" />
+                      <element signature="e#5035#5156#0" />
+                      <element signature="e#5205#5482#0" />
+                      <element signature="e#5233#5482#0" />
+                      <element signature="e#5441#5482#0" />
+                      <element signature="e#5567#6283#0" />
+                      <element signature="e#5831#5976#0" />
+                      <element signature="e#6373#7901#0" />
+                      <element signature="e#6448#6551#0" />
+                      <element signature="e#6667#7615#0" />
+                      <element signature="e#7015#7172#0" />
+                      <element signature="e#7132#7172#0" />
+                      <element signature="e#7737#7825#0" />
+                      <element signature="e#7980#8681#0" />
+                      <element signature="e#8125#8236#0" />
+                      <element signature="e#8347#8681#0" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="469">
-              <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+            <state relative-caret-position="-14">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
               <folding>
                 <element signature="e#15#24#0" expanded="true" />
-                <element signature="e#1772#1983#0" />
-                <element signature="e#2023#2303#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/run_bash.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="23">
+              <caret line="1" column="87" selection-start-line="1" selection-start-column="87" selection-end-line="1" selection-end-column="87" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ddpg.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="331">
+              <caret line="174" selection-start-line="174" selection-end-line="174" />
+              <folding>
+                <element signature="e#617#691#0" />
+                <element signature="e#1103#6284#0" />
+                <element signature="e#1301#1479#0" />
+                <element signature="e#2662#2919#0" />
+                <element signature="e#2980#3113#0" />
+                <element signature="e#3168#3368#0" />
+                <element signature="e#3424#3617#0" />
+                <element signature="e#4145#4376#0" />
+                <element signature="e#4436#4874#0" />
+                <element signature="e#5135#5310#0" />
+                <element signature="e#5375#5541#0" />
+                <element signature="e#6328#6451#0" />
+                <element signature="e#6481#6583#0" />
+                <element signature="e#6613#6672#0" />
+                <element signature="e#6703#7896#0" />
+                <element signature="e#7020#7362#0" />
+                <element signature="e#7485#7600#0" />
+                <element signature="e#8978#10836#0" />
+                <element signature="e#9242#10836#0" />
+                <element signature="e#9242#9262#0" />
+                <element signature="e#10675#10697#0" />
+                <element signature="e#10918#11502#0" />
+                <element signature="e#11127#11502#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="460">
+                <caret line="20" selection-start-line="20" selection-end-line="20" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -42,19 +147,21 @@
         <option value="$PROJECT_DIR$/segment_tree.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/enjoy_kuka_diverse_object_grasping.py" />
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/memory.py" />
         <option value="$PROJECT_DIR$/KukaGymEnv.py" />
-        <option value="$PROJECT_DIR$/ddpg.py" />
+        <option value="$PROJECT_DIR$/memory.py" />
         <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/run_bash.sh" />
+        <option value="$PROJECT_DIR$/ddpg.py" />
+        <option value="$PROJECT_DIR$/priority_memory.py" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2609" />
-    <option name="y" value="108" />
+    <option name="x" value="1830" />
+    <option name="y" value="-14" />
     <option name="width" value="1855" />
-    <option name="height" value="1084" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -112,10 +219,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1985" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.115720525" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14246725" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -196,27 +303,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="253">
-            <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/OUNoise.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="115">
           <caret line="6" column="55" selection-start-line="6" selection-start-column="48" selection-end-line="6" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/memory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="538">
-          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
         </state>
       </provider>
     </entry>
@@ -306,25 +396,103 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg.py">
+    <entry file="file://$PROJECT_DIR$/memory.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="588">
-          <caret line="143" column="34" lean-forward="true" selection-start-line="143" selection-start-column="34" selection-end-line="143" selection-end-column="34" />
-          <folding>
-            <element signature="e#16#39#0" expanded="true" />
-            <element signature="e#8118#9976#0" />
-          </folding>
+        <state relative-caret-position="502">
+          <caret line="73" column="69" selection-start-line="73" selection-start-column="69" selection-end-line="73" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_bash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="1" column="87" selection-start-line="1" selection-start-column="87" selection-end-line="1" selection-end-column="87" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+        <state relative-caret-position="-14">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
           <folding>
             <element signature="e#15#24#0" expanded="true" />
-            <element signature="e#1772#1983#0" />
-            <element signature="e#2023#2303#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/priority_memory.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-161">
+          <caret line="25" column="20" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+          <folding>
+            <element signature="e#137#235#0" />
+            <element signature="e#1037#1061#0" />
+            <element signature="e#1118#1148#0" />
+            <element signature="e#1198#1222#0" />
+            <element signature="e#2414#2833#0" />
+            <element signature="e#2424#2515#0" />
+            <element signature="e#2552#2746#0" />
+            <element signature="e#2878#3291#0" />
+            <element signature="e#3336#3370#0" />
+            <element signature="e#3572#4065#0" />
+            <element signature="e#4993#5501#0" />
+            <element signature="e#5035#5156#0" />
+            <element signature="e#5205#5482#0" />
+            <element signature="e#5233#5482#0" />
+            <element signature="e#5441#5482#0" />
+            <element signature="e#5567#6283#0" />
+            <element signature="e#5831#5976#0" />
+            <element signature="e#6373#7901#0" />
+            <element signature="e#6448#6551#0" />
+            <element signature="e#6667#7615#0" />
+            <element signature="e#7015#7172#0" />
+            <element signature="e#7132#7172#0" />
+            <element signature="e#7737#7825#0" />
+            <element signature="e#7980#8681#0" />
+            <element signature="e#8125#8236#0" />
+            <element signature="e#8347#8681#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="460">
+            <caret line="20" selection-start-line="20" selection-end-line="20" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="174" selection-start-line="174" selection-end-line="174" />
+          <folding>
+            <element signature="e#617#691#0" />
+            <element signature="e#1103#6284#0" />
+            <element signature="e#1301#1479#0" />
+            <element signature="e#2662#2919#0" />
+            <element signature="e#2980#3113#0" />
+            <element signature="e#3168#3368#0" />
+            <element signature="e#3424#3617#0" />
+            <element signature="e#4145#4376#0" />
+            <element signature="e#4436#4874#0" />
+            <element signature="e#5135#5310#0" />
+            <element signature="e#5375#5541#0" />
+            <element signature="e#6328#6451#0" />
+            <element signature="e#6481#6583#0" />
+            <element signature="e#6613#6672#0" />
+            <element signature="e#6703#7896#0" />
+            <element signature="e#7020#7362#0" />
+            <element signature="e#7485#7600#0" />
+            <element signature="e#8978#10836#0" />
+            <element signature="e#9242#10836#0" />
+            <element signature="e#9242#9262#0" />
+            <element signature="e#10675#10697#0" />
+            <element signature="e#10918#11502#0" />
+            <element signature="e#11127#11502#0" />
           </folding>
         </state>
       </provider>

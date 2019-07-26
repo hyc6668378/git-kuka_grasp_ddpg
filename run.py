@@ -10,18 +10,27 @@ from tqdm import tqdm
 import argparse
 import tensorflow as tf
 import random
-parser = argparse.ArgumentParser()
-parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
-parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
-parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
-parser.add_argument('--batch_size',    type=int, default=128, help="batch_size. default = 128")
-parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
-parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
-parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
+
+def common_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--priority", help="priority memory replay", action="store_true")
+    parser.add_argument('--alpha', type=float, default=0.2, help="priority degree")
+    parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
+    parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
+    parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
+    parser.add_argument('--batch_size',    type=int, default=16, help="batch_size. default = 128")
+    parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
+    parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
+    parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
+    parser.add_argument("--turn_beta",  help="turn the beta from 0.6 to 1.0", action="store_true")
+    return  parser
+
+parser = common_arg_parser()
 args = parser.parse_args()
 
 
-ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size)  # 初始化一个DDPG智能体
+ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
+                  prioritiy = args.priority, alpha = args.alpha)  # 初始化一个DDPG智能体
 env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
                            maxSteps=args.max_ep_steps,
@@ -63,7 +72,7 @@ def train(max_episodes):
     succ_list = np.array([])  # the succession rate list
     steps_list = np.array([])  # step counter
     learn_graspsuccess = 0.0
-    for i in range(max_episodes):
+    for i in tqdm(range(max_episodes)):
         obs0, done = env.reset(), False
         f_s0 = env.get_full_state()
         for j in range(args.max_ep_steps):
@@ -95,6 +104,8 @@ def train(max_episodes):
         # Noise decay
         Noise.theta = np.linspace(0.05, 0.0, max_episodes)[i]
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
+        if args.turn_beta:
+            ddpg_agent.beta = np.linspace(0.6, 1.0, max_episodes)[i]
 
         if i % 50 == 0:
             succ_list = np.append(succ_list, learn_graspsuccess)

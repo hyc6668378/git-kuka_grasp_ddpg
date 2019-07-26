@@ -71,6 +71,7 @@ class Memory(object):
             'rewards': array_min2d(reward_batch),
             'actions': array_min2d(action_batch),
             'terminals1': array_min2d(terminal1_batch),
+            'weights': np.ones(array_min2d(reward_batch).shape) # all 1.
         }
         return result
 
