@@ -22,7 +22,7 @@ https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/gym/pybul
 ## 算法选择
 算法部分可以选择`标准DDPG` 和如下`improvements`之一
 - [x] `Prioritied Memory Replay `
-- [ ] `n-step-ruturn`
+- [x] `n-step-ruturn`
 - [ ] `DDPGfD`
 - [ ] `her`
 - [ ] `curiosity`
