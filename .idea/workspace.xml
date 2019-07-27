@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/KukaGymEnv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/M10000_10step_batch_64_steps_list.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/M10000_10step_batch_64_succ_list.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,13 +17,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="25" column="37" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="37" />
+            <state relative-caret-position="92">
+              <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
               <folding>
-                <element signature="e#15#24#0" expanded="true" />
+                <element signature="e#288#1508#0" />
+                <element signature="e#2153#2230#0" />
+                <element signature="e#2273#2462#0" />
+                <element signature="e#2494#2705#0" />
+                <element signature="e#2745#3025#0" />
+                <element signature="e#3056#4876#0" />
+                <element signature="e#4894#5149#0" />
               </folding>
             </state>
           </provider>
@@ -27,8 +38,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ddpg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="180" column="20" selection-start-line="180" selection-start-column="20" selection-end-line="180" selection-end-column="20" />
+            <state relative-caret-position="496">
+              <caret line="158" lean-forward="true" selection-start-line="158" selection-end-line="158" />
               <folding>
                 <element signature="e#16#39#0" expanded="true" />
                 <element signature="e#617#691#0" />
@@ -38,37 +49,16 @@
                 <element signature="e#3375#3575#0" />
                 <element signature="e#3631#3821#0" />
                 <element signature="e#4349#4580#0" />
-                <element signature="e#6136#6302#0" />
                 <element signature="e#7242#7344#0" />
                 <element signature="e#7374#7433#0" />
-                <element signature="e#10922#12780#0" />
-                <element signature="e#11186#12780#0" />
-                <element signature="e#11186#11206#0" />
-                <element signature="e#12619#12641#0" />
-                <element signature="e#12862#13446#0" />
-                <element signature="e#13071#13446#0" />
+                <element signature="e#7498#7720#0" />
+                <element signature="e#7895#8110#0" />
+                <element signature="e#8175#9051#0" />
+                <element signature="e#9078#9443#0" />
+                <element signature="e#9566#9681#0" />
+                <element signature="e#11059#12917#0" />
+                <element signature="e#12756#12778#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/run_bash.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
-              <caret line="1" column="32" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="552">
-                <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-              </first_editor>
-              <second_editor />
             </state>
           </provider>
         </entry>
@@ -87,13 +77,13 @@
         <option value="$PROJECT_DIR$/segment_tree.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/enjoy_kuka_diverse_object_grasping.py" />
-        <option value="$PROJECT_DIR$/KukaGymEnv.py" />
         <option value="$PROJECT_DIR$/memory.py" />
         <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/priority_memory.py" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/KukaGymEnv.py" />
         <option value="$PROJECT_DIR$/ddpg.py" />
         <option value="$PROJECT_DIR$/run_bash.sh" />
-        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -108,7 +98,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -120,6 +109,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -159,7 +149,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1985" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="1984" y="-4" width="1857" height="1085" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14246725" />
@@ -200,13 +190,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mpi_adam.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/training/saver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="1252" column="30" selection-start-line="1252" selection-start-column="30" selection-end-line="1252" selection-end-column="30" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -257,13 +240,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/layers/python/layers/layers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="1119" column="4" selection-start-line="1119" selection-start-column="4" selection-end-line="1119" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -283,16 +259,72 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/memory.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="502">
+        <state relative-caret-position="640">
           <caret line="73" column="69" selection-start-line="73" selection-start-column="69" selection-end-line="73" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/priority_memory.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1472">
+          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
+          <folding>
+            <element signature="e#137#235#0" />
+            <element signature="e#1647#1898#0" />
+            <element signature="e#2415#2834#0" />
+            <element signature="e#2879#3292#0" />
+            <element signature="e#3337#3371#0" />
+            <element signature="e#3573#4066#0" />
+            <element signature="e#4255#4926#0" />
+            <element signature="e#4994#5502#0" />
+            <element signature="e#5036#5157#0" />
+            <element signature="e#5206#5483#0" />
+            <element signature="e#5234#5483#0" />
+            <element signature="e#5442#5483#0" />
+            <element signature="e#5568#6284#0" />
+            <element signature="e#5832#5977#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="552">
+            <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/training/saver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="617">
+          <caret line="768" column="66" lean-forward="true" selection-start-line="768" selection-start-column="66" selection-end-line="768" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/contrib/layers/python/layers/layers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="1120" column="29" selection-start-line="1120" selection-start-column="18" selection-end-line="1120" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_bash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="46">
+          <caret line="2" column="25" selection-start-line="2" selection-start-column="25" selection-end-line="2" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/KukaGymEnv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="110" column="11" selection-start-line="110" selection-start-column="11" selection-end-line="110" selection-end-column="11" />
+        <state relative-caret-position="368">
+          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
           <folding>
+            <element signature="e#16#37#0" expanded="true" />
+            <element signature="e#303#14544#0" />
             <element signature="e#303#509#1" />
             <element signature="e#1027#3894#0" />
             <element signature="e#1027#2309#1" />
@@ -343,8 +375,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ddpg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="180" column="20" selection-start-line="180" selection-start-column="20" selection-end-line="180" selection-end-column="20" />
+        <state relative-caret-position="496">
+          <caret line="158" lean-forward="true" selection-start-line="158" selection-end-line="158" />
           <folding>
             <element signature="e#16#39#0" expanded="true" />
             <element signature="e#617#691#0" />
@@ -354,81 +386,32 @@
             <element signature="e#3375#3575#0" />
             <element signature="e#3631#3821#0" />
             <element signature="e#4349#4580#0" />
-            <element signature="e#6136#6302#0" />
             <element signature="e#7242#7344#0" />
             <element signature="e#7374#7433#0" />
-            <element signature="e#10922#12780#0" />
-            <element signature="e#11186#12780#0" />
-            <element signature="e#11186#11206#0" />
-            <element signature="e#12619#12641#0" />
-            <element signature="e#12862#13446#0" />
-            <element signature="e#13071#13446#0" />
+            <element signature="e#7498#7720#0" />
+            <element signature="e#7895#8110#0" />
+            <element signature="e#8175#9051#0" />
+            <element signature="e#9078#9443#0" />
+            <element signature="e#9566#9681#0" />
+            <element signature="e#11059#12917#0" />
+            <element signature="e#12756#12778#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="25" column="37" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="37" />
+        <state relative-caret-position="92">
+          <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
           <folding>
-            <element signature="e#15#24#0" expanded="true" />
+            <element signature="e#288#1508#0" />
+            <element signature="e#2153#2230#0" />
+            <element signature="e#2273#2462#0" />
+            <element signature="e#2494#2705#0" />
+            <element signature="e#2745#3025#0" />
+            <element signature="e#3056#4876#0" />
+            <element signature="e#4894#5149#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/priority_memory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="624">
-          <caret line="209" column="52" selection-start-line="209" selection-start-column="45" selection-end-line="209" selection-end-column="52" />
-          <folding>
-            <element signature="e#137#235#0" />
-            <element signature="e#264#3371#0" />
-            <element signature="e#302#1005#0" />
-            <element signature="e#780#949#0" />
-            <element signature="e#1038#1062#0" />
-            <element signature="e#1119#1149#0" />
-            <element signature="e#1199#1223#0" />
-            <element signature="e#1456#2360#0" />
-            <element signature="e#1647#1898#0" />
-            <element signature="e#2415#2834#0" />
-            <element signature="e#2425#2516#0" />
-            <element signature="e#2553#2747#0" />
-            <element signature="e#2879#3292#0" />
-            <element signature="e#3337#3371#0" />
-            <element signature="e#3573#4066#0" />
-            <element signature="e#4255#4926#0" />
-            <element signature="e#4994#5502#0" />
-            <element signature="e#5036#5157#0" />
-            <element signature="e#5206#5483#0" />
-            <element signature="e#5234#5483#0" />
-            <element signature="e#5442#5483#0" />
-            <element signature="e#5568#6284#0" />
-            <element signature="e#5832#5977#0" />
-            <element signature="e#7016#7173#0" />
-            <element signature="e#7133#7173#0" />
-            <element signature="e#7738#7826#0" />
-            <element signature="e#7981#8682#0" />
-            <element signature="e#8126#8237#0" />
-            <element signature="e#8348#8682#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run_bash.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="1" column="32" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="552">
-            <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>

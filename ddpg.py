@@ -11,9 +11,8 @@ from mpi_adam import MpiAdam
 from functools import partial
 
 
-conv2_ = partial(tc.layers.conv2d, kernel_size=3, stride=1, padding='same', activation_fn=None)
+conv2_ = partial(tc.layers.conv2d, kernel_size=3, stride=2, padding='valid', activation_fn=None)
 bn = partial(tc.layers.batch_norm, scale=True, updates_collections=None)
-max_pooling_2D = partial(tf.layers.max_pooling2d,  pool_size=2, strides=2)
 def normalize(x, stats):
     if stats is None:
         return x
@@ -48,8 +47,8 @@ class DDPG(object):
         self.beta = 0.6
 
         # 定义 placeholders
-        self.observe_Input = tf.placeholder(tf.float32, [None, 224, 224, 3], name='observe_Input')
-        self.observe_Input_ = tf.placeholder(tf.float32, [None, 224, 224, 3], name='observe_Input_')
+        self.observe_Input = tf.placeholder(tf.float32, [None, 128, 128, 3], name='observe_Input')
+        self.observe_Input_ = tf.placeholder(tf.float32, [None, 128, 128, 3], name='observe_Input_')
         self.f_s = tf.placeholder(tf.float32, [None, 24], name='full_state_Input')
         self.f_s_ = tf.placeholder(tf.float32, [None, 24], name='fill_state_Input_')
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
@@ -58,7 +57,7 @@ class DDPG(object):
         self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='n_step_reached')
 
         with tf.variable_scope('obs_rms'):
-            self.obs_rms = RunningMeanStd(shape=(224, 224, 3))
+            self.obs_rms = RunningMeanStd(shape=(128, 128, 3))
         with tf.variable_scope('state_rms'):
             self.state_rms = RunningMeanStd(shape=(24,))
         with tf.name_scope('obs_preprocess'):
@@ -158,8 +157,7 @@ class DDPG(object):
         else:
             batch = self.memory.sample(batch_size=self.batch_size)
 
-
-        target_q_1step = self.sess.run(
+        one_step_target_q = self.sess.run(
             self.q_target,
             feed_dict={
                 self.observe_Input_: batch['obs1'],
@@ -181,7 +179,7 @@ class DDPG(object):
             td_error, critic_grads, s = self.sess.run(
                 [self.td_error, self.critic_grads, self.merged_summary],
                 feed_dict={
-                    self.q_target: target_q_1step,
+                    self.q_target: one_step_target_q,
                     self.n_step_target_q: n_step_target_q,
                     self.f_s: batch['f_s0'],
                     self.action: batch['actions'],
@@ -191,7 +189,7 @@ class DDPG(object):
             td_error, critic_grads, s = self.sess.run(
                 [self.td_error, self.critic_grads, self.merged_summary],
                 feed_dict={
-                    self.q_target: target_q_1step,
+                    self.q_target: one_step_target_q,
                     self.f_s: batch['f_s0'],
                     self.action: batch['actions'],
                     self.ISWeights: batch['weights']
@@ -246,34 +244,17 @@ class DDPG(object):
         relu = partial(tf.nn.relu)
         with tf.variable_scope(scope):
             # conv -> BN -> relu
-            # vgg 16 架构
-            net = relu(bn_a(conv2_a( observe_input, 64 )))
+            net = relu(bn_a(conv2_a( observe_input, 32 )))
+            net = relu(bn_a(conv2_a( net, 32 )))
             net = relu(bn_a(conv2_a( net, 64 )))
-            net = max_pooling_2D( net )
-
+            net = relu(bn_a(conv2_a( net, 64 )))
             net = relu(bn_a(conv2_a( net, 128 )))
             net = relu(bn_a(conv2_a( net, 128 )))
-            net = max_pooling_2D( net )
-
-            net = relu(bn_a(conv2_a( net, 256 )))
-            net = relu(bn_a(conv2_a( net, 256 )))
-            net = relu(bn_a(conv2_a( net, 256 )))
-            net = max_pooling_2D( net )
-
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = max_pooling_2D( net )
-
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = relu(bn_a(conv2_a( net, 512 )))
-            net = max_pooling_2D( net )
 
             net = tf.layers.flatten(net)
 
-            net = relu(bn_a(fc_a( net, 2048 )))
-            net = relu(bn_a(fc_a( net, 2048 )))
+            net = relu(bn_a(fc_a( net, 128 )))
+            net = relu(bn_a(fc_a( net, 128 )))
             action_output = fc_a( net, 4, activation=tf.nn.tanh,
                                   kernel_initializer=tf.initializers.random_uniform(minval=-0.0003,
                                                                                     maxval=0.0003))
@@ -293,8 +274,8 @@ class DDPG(object):
         with tf.variable_scope(scope):
 
             net = tf.concat([f_s, a], axis=1)
-            net = relu(bn_a(fc_c( net, 2048 )))
-            net = relu(bn_a(fc_c( net, 2048 )))
+            net = relu(bn_a(fc_c( net, 128 )))
+            net = relu(bn_a(fc_c( net, 128 )))
 
             q = fc_c(net, 1, kernel_initializer=tf.initializers.random_uniform(minval=-0.0003,
                                                                                maxval=0.0003))

@@ -33,8 +33,8 @@ class KukaDiverseObjectEnv(Kuka):
                  removeHeightHack=False,
                  blockRandom=0.3,
                  cameraRandom=0,
-                 width=224,
-                 height=224,
+                 width=128,
+                 height=128,
                  numObjects=5,
                  isTest=False):
         """Initializes the KukaDiverseObjectEnv.
