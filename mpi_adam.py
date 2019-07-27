@@ -1,10 +1,5 @@
 # coding=utf-8
 
-"""
-为了将代码全部转移到 python2.7
-将baselines的重要工具全都独立出来.
-mpi_adam.py 是从 baselines.common.mpi_adam.py 拷贝而来.
-"""
 from mpi4py import MPI
 import tf_util as U
 import tensorflow as tf
@@ -84,3 +79,6 @@ def test_MpiAdam():
         l,g = lossandgrad()
         adam.update(g, stepsize)
         print(i,l)
+
+if __name__ == '__main__':
+    test_MpiAdam()

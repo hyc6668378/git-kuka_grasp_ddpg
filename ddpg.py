@@ -102,25 +102,25 @@ class DDPG(object):
 
             if self.use_n_step:
                 n_step_td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.nstep_td_error)) * self.lambda_nstep
-                critic_losses = one_step_losse + n_step_td_losses + L2_regular
+                c_loss = one_step_losse + n_step_td_losses + L2_regular
             else:
-                critic_losses = one_step_losse + L2_regular
+                c_loss = one_step_losse + L2_regular
 
-        tf.summary.scalar('critic_losses', critic_losses)
+        tf.summary.scalar('c_loss', c_loss)
         with tf.variable_scope('Actor_lose'):
             a_loss = - tf.reduce_mean(q)
 
         # Setting optimizer for Actor and Critic
         with tf.variable_scope('Critic_Optimizer'):
-            self.critic_grads = tf_util.flatgrad(critic_losses, self.ce_params)
-            self.critic_optimizer = MpiAdam(var_list=self.ce_params, beta1=0.9, beta2=0.999, epsilon=1e-08)
+            self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss, var_list=self.ce_params)
 
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS) # batch-normal 参数更新
         with tf.variable_scope('Actor_Optimizer'):
-            self.actor_grads = tf_util.flatgrad(a_loss, self.ae_params)
-            self.actor_optimizer = MpiAdam(var_list=self.ae_params, beta1=0.9, beta2=0.999, epsilon=1e-08)
+            with tf.control_dependencies(update_ops):
+                self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
+
 
         self.sess.run(tf.global_variables_initializer())
-        self.critic_optimizer.sync()
 
         #  init_target net-work with evaluate net-params
         self.init_a_t = [tf.assign(t, e) for t, e in zip(self.at_params, self.ae_params)]
@@ -176,8 +176,8 @@ class DDPG(object):
                            self.f_s_: n_step_batch['f_s1']
                            })
 
-            td_error, critic_grads, s = self.sess.run(
-                [self.td_error, self.critic_grads, self.merged_summary],
+            td_error, _, s = self.sess.run(
+                [self.td_error, self.ctrain, self.merged_summary],
                 feed_dict={
                     self.q_target: one_step_target_q,
                     self.n_step_target_q: n_step_target_q,
@@ -186,8 +186,8 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
         else:
-            td_error, critic_grads, s = self.sess.run(
-                [self.td_error, self.critic_grads, self.merged_summary],
+            td_error, _, s = self.sess.run(
+                [self.td_error, self.ctrain, self.merged_summary],
                 feed_dict={
                     self.q_target: one_step_target_q,
                     self.f_s: batch['f_s0'],
@@ -195,11 +195,8 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
 
-        self.critic_optimizer.update(critic_grads, stepsize=LR_C)
-
-        actor_grads = self.sess.run(self.actor_grads, {self.observe_Input: batch['obs0'],
-                                                       self.f_s: batch['f_s0']})
-        self.actor_optimizer.update(actor_grads, stepsize=LR_A)
+        self.sess.run(self.atrain, {self.observe_Input: batch['obs0'],
+                                    self.f_s: batch['f_s0']})
 
         if self.is_prioritiy:
             self.memory.update_priorities(batch['idxes'], td_errors=td_error)

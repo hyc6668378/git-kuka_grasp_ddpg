@@ -18,7 +18,7 @@ def common_arg_parser():
     parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
     parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
     parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
-    parser.add_argument('--batch_size',    type=int, default=16, help="batch_size. default = 128")
+    parser.add_argument('--batch_size',    type=int, default=16, help="batch_size. default = 16")
     parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
     parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
     parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
@@ -124,7 +124,7 @@ def main():
     set_global_seeds(args.seed)
     os.system("clear")
 
-    succ_list, steps_list = train(max_episodes=3000)
+    succ_list, steps_list = train(max_episodes=8000)
 
     save_all(succ_list, steps_list)
 
