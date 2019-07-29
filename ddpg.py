@@ -6,13 +6,12 @@ from memory import Memory
 from priority_memory import PrioritizedMemory
 from mpi_running_mean_std import RunningMeanStd        # update the mean and std dynamically.
 import tensorflow.contrib as tc
-import tf_util as tf_util
-from mpi_adam import MpiAdam
 from functools import partial
 
 
 conv2_ = partial(tc.layers.conv2d, kernel_size=3, stride=2, padding='valid', activation_fn=None)
 bn = partial(tc.layers.batch_norm, scale=True, updates_collections=None)
+
 def normalize(x, stats):
     if stats is None:
         return x
@@ -25,11 +24,13 @@ LR_A = 0.0001       # learning rate for actor
 LR_C = 0.001        # learning rate for critic
 GAMMA = 0.99        # reward discount
 TAU = 0.005         # soft replacement
+LAMBDA_BC = 0.5     # behavior clone weitht
 
 # -----------------------------  DDPG ---------------------------------------------
 
 class DDPG(object):
-    def __init__(self, memory_capacity, batch_size, prioritiy, alpha=0.2, use_n_step=False, n_step_return=5):
+    def __init__(self, memory_capacity, batch_size, prioritiy,
+                 alpha=0.2, use_n_step=False, n_step_return=5, is_training=True):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
@@ -38,8 +39,8 @@ class DDPG(object):
             self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
         else:
             self.memory = Memory(limit=memory_capacity, action_shape=(4,),
-                             observation_shape=(224, 224, 3),
-                             full_state_shape=(24, ))
+                                 observation_shape=(224, 224, 3),
+                                 full_state_shape=(24, ))
         self.pointer = 0                        # memory 计数器　
         self.sess = tf.InteractiveSession()     # 创建一个默认会话
         self.lambda_1step = 0.5                 # 1_step_return_loss的权重
@@ -55,6 +56,9 @@ class DDPG(object):
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
         self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
         self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='n_step_reached')
+        self.q_demo = tf.placeholder(tf.float32, [None, 1], name='Q_of_actions_from_memory')
+        self.come_from_demo = tf.placeholder(tf.float32, [None, 1], name='Demo_index')
+        self.action_memory = tf.placeholder(tf.float32, [None, 4], name='actions_from_memory')
 
         with tf.variable_scope('obs_rms'):
             self.obs_rms = RunningMeanStd(shape=(128, 128, 3))
@@ -70,12 +74,16 @@ class DDPG(object):
             self.normalized_f_s1 = normalize(self.f_s_, self.state_rms)
 
         with tf.variable_scope('Actor'):
-            self.action = self.build_actor(self.normalized_observe_Input, scope='eval', trainable=True)
-            self.action_ = self.build_actor(self.normalized_observe_Input_, scope='target', trainable=False)
+            self.action = self.build_actor(self.normalized_observe_Input,
+                                           scope='eval', trainable=True, is_training=is_training)
+            self.action_ = self.build_actor(self.normalized_observe_Input_,
+                                            scope='target', trainable=False, is_training=False)
 
         with tf.variable_scope('Critic'):
-            q = self.build_critic(self.normalized_f_s0, self.action, scope='eval', trainable=True)
-            q_ = self.build_critic(self.normalized_f_s1, self.action_, scope='target', trainable=False)
+            self.q = self.build_critic(self.normalized_f_s0, self.action,
+                                       scope='eval', trainable=True, is_training=is_training)
+            q_ = self.build_critic(self.normalized_f_s1, self.action_,
+                                   scope='target', trainable=False, is_training=False)
 
         # Collect networks parameters. It would make it more easily to manage them.
         self.ae_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/eval')
@@ -86,15 +94,17 @@ class DDPG(object):
         with tf.variable_scope('Soft_Update'):
             self.soft_replace_a = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.at_params, self.ae_params)]
             self.soft_replace_c = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.ct_params, self.ce_params)]
+
+        # critic 的误差 为 (one-step-td 误差 + n-step-td 误差 + critic_online 的L2惩罚)
         with tf.variable_scope('Critic_Lose'):
             self.q_target = self.R + (1. - self.terminals1) * GAMMA * q_
 
             if self.use_n_step:
                 self.n_step_target_q = self.R + (1. - self.terminals1) * tf.pow(GAMMA, self.n_step_steps) * q_
-            self.td_error = tf.abs(self.q_target - q)
+            self.td_error = tf.abs(self.q_target - self.q)
 
             if self.use_n_step:
-                self.nstep_td_error = tf.abs(self.n_step_target_q - q)
+                self.nstep_td_error = tf.abs(self.n_step_target_q - self.q)
 
             L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                      weights_list=self.ce_params)
@@ -106,9 +116,14 @@ class DDPG(object):
             else:
                 c_loss = one_step_losse + L2_regular
 
-        tf.summary.scalar('c_loss', c_loss)
+        # actor 的 loss 为 最大化q(s,a) 最小化行为克隆误差.
+        # (只有demo的transition 且 demo的action 比 actor生成的action q(s,a)高的时候 才会有克隆误差)
         with tf.variable_scope('Actor_lose'):
-            a_loss = - tf.reduce_mean(q)
+            Is_worse_than_demo = self.q < self.q_demo
+            action_diffs = tf.cast(Is_worse_than_demo, tf.float32) * tf.reduce_mean(
+                self.come_from_demo * tf.square(self.action - self.action_memory), 1, keep_dims=True)
+            L_BC = LAMBDA_BC * tf.reduce_mean(action_diffs)
+            a_loss = - tf.reduce_mean(self.q) + L_BC
 
         # Setting optimizer for Actor and Critic
         with tf.variable_scope('Critic_Optimizer'):
@@ -118,7 +133,6 @@ class DDPG(object):
         with tf.variable_scope('Actor_Optimizer'):
             with tf.control_dependencies(update_ops):
                 self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
-
 
         self.sess.run(tf.global_variables_initializer())
 
@@ -133,7 +147,9 @@ class DDPG(object):
         var_list += tf.trainable_variables()
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
         self.writer = tf.summary.FileWriter("logs/", self.sess.graph)
-        self.merged_summary = tf.summary.merge_all()
+        self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss),
+                                           tf.summary.scalar('L_BC',   L_BC)])
+        self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss', c_loss)])
 
     def choose_action(self, obs):
         obs = obs.astype(dtype=np.float32)
@@ -176,8 +192,8 @@ class DDPG(object):
                            self.f_s_: n_step_batch['f_s1']
                            })
 
-            td_error, _, s = self.sess.run(
-                [self.td_error, self.ctrain, self.merged_summary],
+            td_error, _, c_s, q_demo = self.sess.run(
+                [self.td_error, self.ctrain, self.c_summary, self.q],
                 feed_dict={
                     self.q_target: one_step_target_q,
                     self.n_step_target_q: n_step_target_q,
@@ -186,8 +202,8 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
         else:
-            td_error, _, s = self.sess.run(
-                [self.td_error, self.ctrain, self.merged_summary],
+            td_error, _, c_s, q_demo = self.sess.run(
+                [self.td_error, self.ctrain, self.c_summary, self.q],
                 feed_dict={
                     self.q_target: one_step_target_q,
                     self.f_s: batch['f_s0'],
@@ -195,15 +211,21 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
 
-        self.sess.run(self.atrain, {self.observe_Input: batch['obs0'],
-                                    self.f_s: batch['f_s0']})
+        # TODO: 更新 actor时候 试一试 用 target net 算 q
+        _, a_s, = self.sess.run([self.atrain, self.a_summary],
+                              {self.observe_Input: batch['obs0'],
+                                    self.q_demo: q_demo,
+                                    self.f_s: batch['f_s0'],
+                                    self.come_from_demo: batch['demos'],
+                                    self.action_memory: batch['actions']})
 
         if self.is_prioritiy:
             self.memory.update_priorities(batch['idxes'], td_errors=td_error)
 
         self.sess.run(self.soft_replace_a)
         self.sess.run(self.soft_replace_c)
-        self.writer.add_summary(s)
+        self.writer.add_summary(c_s)
+        self.writer.add_summary(a_s)
 
     def store_transition(self,
                          obs0,
@@ -224,9 +246,9 @@ class DDPG(object):
         self.memory.append( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
                             obs1=obs1, f_s1=full_state1, terminal1=terminal1)
 
+        # 增量式的更新observe的均值标准差
         self.obs_rms.update(np.array([obs0]))
         self.obs_rms.update(np.array([obs1]))
-
         self.state_rms.update(np.array([full_state0]))
         self.state_rms.update(np.array([full_state1]))
 

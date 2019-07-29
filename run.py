@@ -35,8 +35,10 @@ args = parser.parse_args()
 
 
 ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
-                  prioritiy = args.priority, alpha = args.alpha,
-                  use_n_step = args.use_n_step ,n_step_return = args.n_step_return)  # 初始化一个DDPG智能体
+                  prioritiy=args.priority, alpha=args.alpha,
+                  use_n_step=args.use_n_step, n_step_return=args.n_step_return,
+                  is_training=True)
+
 env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
                            maxSteps=args.max_ep_steps,
@@ -125,14 +127,15 @@ def train(max_episodes):
             obs0 = obs1
             f_s0 = f_s1
 
-            if info['grasp_success'] == 1:  # 探索阶段 抓取成功 计数器加1
+            if info['grasp_success'] == 1:
                 learn_graspsuccess += 1
 
             if ddpg_agent.pointer > args.memory_size:
                 for _ in range(args.inter_learn_steps):
                     ddpg_agent.learn()
-            if done:  # done 指的是尝试完抓取 或者 达到最大steps
+            if done:
                 break
+
         # Noise decay
         Noise.theta = np.linspace(0.05, 0.0, max_episodes)[i]
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
