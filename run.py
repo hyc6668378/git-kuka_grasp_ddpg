@@ -87,7 +87,7 @@ def demo_collect(Demo_CAPACITY):
                                     action=transition['action'],
                                     reward=transition['reward'],
                                     full_state1=transition['f_s1'],
-                                    obs1=transition['f_s0'],
+                                    obs1=transition['obs1'],
                                     terminal1=transition['terminal1'],
                                     demo = True)
     print(" Demo Collection completed.")
