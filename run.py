@@ -79,9 +79,7 @@ def demo_collect(Demo_CAPACITY):
     print("\n Demo Collecting...")
 
     for i in tqdm(range(Demo_CAPACITY)):
-        demo_tran_file_path = \
-            '/home/baxter/catkin_ws/src/huang/scripts/all_demo/demo%d.npy' \
-            % (i)
+        demo_tran_file_path = 'all_demo/demo%d.npy' % (i)
         transition = np.load(demo_tran_file_path, allow_pickle=True)
         transition = transition.tolist()
         ddpg_agent.store_transition(full_state0=transition['f_s0'],

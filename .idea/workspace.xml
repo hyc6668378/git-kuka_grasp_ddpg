@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,109 +12,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="644">
-              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="492">
+              <caret line="79" lean-forward="true" selection-start-line="79" selection-end-line="79" />
               <folding>
-                <element signature="e#15#24#0" expanded="true" />
-                <element signature="e#2131#2208#0" />
-                <element signature="e#2251#2440#0" />
-                <element signature="e#2472#2683#0" />
-                <element signature="e#2723#3003#0" />
-                <element signature="e#3161#3970#0" />
-                <element signature="e#4173#4478#0" />
-                <element signature="e#3034#4854#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="667">
-                <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="220" column="16" lean-forward="true" selection-start-line="220" selection-start-column="16" selection-end-line="220" selection-end-column="16" />
-              <folding>
-                <element signature="e#543#617#0" />
-                <element signature="e#1064#6876#0" />
-                <element signature="e#1342#1520#0" />
-                <element signature="e#2798#3055#0" />
-                <element signature="e#3116#3246#0" />
-                <element signature="e#3301#3501#0" />
-                <element signature="e#3557#3747#0" />
-                <element signature="e#4275#4506#0" />
-                <element signature="e#4566#5547#0" />
-                <element signature="e#5301#5476#0" />
-                <element signature="e#6027#6169#0" />
-                <element signature="e#6920#7041#0" />
-                <element signature="e#7071#7173#0" />
-                <element signature="e#7203#7262#0" />
-                <element signature="e#7293#9603#0" />
-                <element signature="e#7327#7549#0" />
-                <element signature="e#7724#7939#0" />
-                <element signature="e#8004#8863#0" />
-                <element signature="e#8101#8441#0" />
-                <element signature="e#8581#8862#0" />
-                <element signature="e#8890#9238#0" />
-                <element signature="e#9015#9237#0" />
-                <element signature="e#9275#9371#0" />
-                <element signature="e#10685#11961#0" />
-                <element signature="e#10949#11961#0" />
-                <element signature="e#11800#11822#0" />
-                <element signature="e#12043#12625#0" />
-                <element signature="e#12252#12625#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/priority_memory.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="144" column="19" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="19" />
-              <folding>
-                <element signature="e#137#235#0" />
-                <element signature="e#780#949#0" />
-                <element signature="e#1038#1062#0" />
-                <element signature="e#2415#2834#0" />
-                <element signature="e#2425#2516#0" />
-                <element signature="e#2553#2747#0" />
-                <element signature="e#2879#3292#0" />
-                <element signature="e#3337#3371#0" />
-                <element signature="e#3573#4066#0" />
-                <element signature="e#4255#4926#0" />
-                <element signature="e#5250#5779#0" />
-                <element signature="e#4994#5502#0" />
-                <element signature="e#5036#5157#0" />
-                <element signature="e#5206#5483#0" />
-                <element signature="e#5234#5483#0" />
-                <element signature="e#5442#5483#0" />
-                <element signature="e#5568#6284#0" />
-                <element signature="e#5832#5977#0" />
-                <element signature="e#6374#7912#0" />
-                <element signature="e#6449#6552#0" />
-                <element signature="e#6668#7626#0" />
-                <element signature="e#7026#7183#0" />
-                <element signature="e#7143#7183#0" />
-                <element signature="e#7748#7836#0" />
-                <element signature="e#7991#8692#0" />
-                <element signature="e#8136#8247#0" />
-                <element signature="e#8358#8692#0" />
+                <element signature="e#288#1826#0" />
+                <element signature="e#2471#2548#0" />
+                <element signature="e#2591#2780#0" />
+                <element signature="e#2812#3023#0" />
+                <element signature="e#3063#3343#0" />
+                <element signature="e#5529#5607#0" />
+                <element signature="e#5960#6230#0" />
               </folding>
             </state>
           </provider>
@@ -146,9 +56,9 @@
         <option value="$PROJECT_DIR$/priority_memory.py" />
         <option value="$PROJECT_DIR$/ddpg.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/run_bash.sh" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/run.py" />
       </list>
     </option>
   </component>
@@ -247,7 +157,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="选action 用online actor网络." />
-    <option name="LAST_COMMIT_MESSAGE" value="选action 用online actor网络." />
+    <MESSAGE value="增加 DDPGfD" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加 DDPGfD" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file:///usr/lib/python3.6/pdb.py">
@@ -411,39 +322,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/priority_memory.py">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="144" column="19" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="19" />
-          <folding>
-            <element signature="e#137#235#0" />
-            <element signature="e#780#949#0" />
-            <element signature="e#1038#1062#0" />
-            <element signature="e#2415#2834#0" />
-            <element signature="e#2425#2516#0" />
-            <element signature="e#2553#2747#0" />
-            <element signature="e#2879#3292#0" />
-            <element signature="e#3337#3371#0" />
-            <element signature="e#3573#4066#0" />
-            <element signature="e#4255#4926#0" />
-            <element signature="e#5250#5779#0" />
-            <element signature="e#4994#5502#0" />
-            <element signature="e#5036#5157#0" />
-            <element signature="e#5206#5483#0" />
-            <element signature="e#5234#5483#0" />
-            <element signature="e#5442#5483#0" />
-            <element signature="e#5568#6284#0" />
-            <element signature="e#5832#5977#0" />
-            <element signature="e#6374#7912#0" />
-            <element signature="e#6449#6552#0" />
-            <element signature="e#6668#7626#0" />
-            <element signature="e#7026#7183#0" />
-            <element signature="e#7143#7183#0" />
-            <element signature="e#7748#7836#0" />
-            <element signature="e#7991#8692#0" />
-            <element signature="e#8136#8247#0" />
-            <element signature="e#8358#8692#0" />
-          </folding>
+        <state relative-caret-position="184">
+          <caret line="8" column="8" selection-start-line="8" selection-start-column="8" selection-end-line="8" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_bash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="4" column="11" lean-forward="true" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="460">
+            <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
@@ -484,44 +383,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/priority_memory.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" column="8" selection-start-line="8" selection-start-column="8" selection-end-line="8" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run_bash.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="4" column="11" lean-forward="true" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
+        <state relative-caret-position="561">
+          <caret line="144" column="19" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="19" />
+          <folding>
+            <element signature="e#137#235#0" />
+            <element signature="e#780#949#0" />
+            <element signature="e#1038#1062#0" />
+            <element signature="e#2415#2834#0" />
+            <element signature="e#2425#2516#0" />
+            <element signature="e#2553#2747#0" />
+            <element signature="e#2879#3292#0" />
+            <element signature="e#3337#3371#0" />
+            <element signature="e#3573#4066#0" />
+            <element signature="e#4255#4926#0" />
+            <element signature="e#5250#5779#0" />
+            <element signature="e#4994#5502#0" />
+            <element signature="e#5036#5157#0" />
+            <element signature="e#5206#5483#0" />
+            <element signature="e#5234#5483#0" />
+            <element signature="e#5442#5483#0" />
+            <element signature="e#5568#6284#0" />
+            <element signature="e#5832#5977#0" />
+            <element signature="e#6374#7912#0" />
+            <element signature="e#6449#6552#0" />
+            <element signature="e#6668#7626#0" />
+            <element signature="e#7026#7183#0" />
+            <element signature="e#7143#7183#0" />
+            <element signature="e#7748#7836#0" />
+            <element signature="e#7991#8692#0" />
+            <element signature="e#8136#8247#0" />
+            <element signature="e#8358#8692#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="644">
-          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+        <state relative-caret-position="492">
+          <caret line="79" lean-forward="true" selection-start-line="79" selection-end-line="79" />
           <folding>
-            <element signature="e#15#24#0" expanded="true" />
-            <element signature="e#2131#2208#0" />
-            <element signature="e#2251#2440#0" />
-            <element signature="e#2472#2683#0" />
-            <element signature="e#2723#3003#0" />
-            <element signature="e#3161#3970#0" />
-            <element signature="e#4173#4478#0" />
-            <element signature="e#3034#4854#0" />
+            <element signature="e#288#1826#0" />
+            <element signature="e#2471#2548#0" />
+            <element signature="e#2591#2780#0" />
+            <element signature="e#2812#3023#0" />
+            <element signature="e#3063#3343#0" />
+            <element signature="e#5529#5607#0" />
+            <element signature="e#5960#6230#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="667">
-            <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
