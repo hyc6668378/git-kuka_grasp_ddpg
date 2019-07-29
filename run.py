@@ -22,7 +22,7 @@ def common_arg_parser():
     parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
     parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
     parser.add_argument('--isRENDER',  action="store_true", help="渲染GUI .")
-    parser.add_argument("--turn_beta",  help="turn the beta from 0.6 to 1.0", action="store_true")
+    parser.add_argument("--turn_beta",  action="store_true", help="turn the beta from 0.6 to 1.0")
     parser.add_argument("--use_n_step", help="use n_step_loss", action="store_true")
     parser.add_argument('--n_step_return', type=int, default=5, help="n step return. default = 5")
     parser.add_argument('--Demo_CAPACITY', type=int, default=2000, help="The number of demo transitions. default = 2000")
