@@ -13,7 +13,7 @@ import random
 
 def common_arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--priority", help="priority memory replay", action="store_true")
+    parser.add_argument("-p", "--priority", action="store_true", help="priority memory replay")
     parser.add_argument('--alpha', type=float, default=0.2, help="priority degree")
     parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
     parser.add_argument('--inter_learn_steps', type=int, default=5, help="一个step中agent.learn()的次数. default = 3")
@@ -21,11 +21,13 @@ def common_arg_parser():
     parser.add_argument('--batch_size',    type=int, default=16, help="batch_size. default = 16")
     parser.add_argument('--max_ep_steps',    type=int, default=50, help="一个episode最大长度. default = 50")
     parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
-    parser.add_argument('--isRENDER',    type=bool, default=False, help="是否渲染. default = False")
+    parser.add_argument('--isRENDER',  action="store_true", help="渲染GUI .")
     parser.add_argument("--turn_beta",  help="turn the beta from 0.6 to 1.0", action="store_true")
     parser.add_argument("--use_n_step", help="use n_step_loss", action="store_true")
-    parser.add_argument('--n_step_return',    type=int, default=5, help="n step return. default = 5")
-
+    parser.add_argument('--n_step_return', type=int, default=5, help="n step return. default = 5")
+    parser.add_argument('--Demo_CAPACITY', type=int, default=2000, help="The number of demo transitions. default = 2000")
+    parser.add_argument('--PreTrain_STEPS', type=int, default=2000, help="The steps for PreTrain. default = 2000")
+    parser.add_argument('--max_episodes', type=int, default=8000, help="The Max episodes. default = 8000")
     return  parser
 
 parser = common_arg_parser()
@@ -71,6 +73,34 @@ def plot(succ_list, steps_list):
     plt.xlabel('train_Episode')
     plt.ylabel('success rate')
     plt.savefig('result/'+args.experiment_name+'.png')
+
+def demo_collect(Demo_CAPACITY):
+
+    print("\n Demo Collecting...")
+
+    for i in tqdm(range(Demo_CAPACITY)):
+        demo_tran_file_path = \
+            '/home/baxter/catkin_ws/src/huang/scripts/all_demo/demo%d.npy' \
+            % (i)
+        transition = np.load(demo_tran_file_path, allow_pickle=True)
+        transition = transition.tolist()
+        ddpg_agent.store_transition(full_state0=transition['f_s0'],
+                                    obs0=transition['obs0'],
+                                    action=transition['action'],
+                                    reward=transition['reward'],
+                                    full_state1=transition['f_s1'],
+                                    obs1=transition['f_s0'],
+                                    terminal1=transition['terminal1'],
+                                    demo = True)
+    print(" Demo Collection completed.")
+
+def preTrain(PreTrain_STEPS):
+    print("\n PreTraining ...")
+
+    for _ in tqdm(range(PreTrain_STEPS)):
+        ddpg_agent.learn()
+
+    print(" PreTraining completed.")
 
 def train(max_episodes):
     succ_list = np.array([])  # the succession rate list
@@ -121,15 +151,20 @@ def train(max_episodes):
 
 def main():
     t1 = time.time()
+
     set_global_seeds(args.seed)
+
     os.system("clear")
 
-    succ_list, steps_list = train(max_episodes=8000)
+    demo_collect( args.Demo_CAPACITY )
 
-    save_all(succ_list, steps_list)
+    preTrain( args.PreTrain_STEPS )
 
-    plot(succ_list, steps_list)
-    print('total Running time: ', (time.time() - t1)/3600.)
+    succ_list, steps_list = train( args.max_episodes )
+
+    save_all( succ_list, steps_list )
+    plot( succ_list, steps_list )
+    print("total Running time:{:.2f}(h) ".format((time.time() - t1)/3600.))
 
 if __name__ == '__main__':
     main()

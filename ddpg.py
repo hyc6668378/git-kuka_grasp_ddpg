@@ -212,19 +212,17 @@ class DDPG(object):
                          obs1,
                          full_state0,
                          full_state1,
-                         terminal1):
+                         terminal1,
+                         demo = False):
         obs0 = obs0.astype(np.float32)
         obs1 = obs1.astype(np.float32)
         full_state0 = full_state0.astype(np.float32)
         full_state1 = full_state1.astype(np.float32)
-
-        self.memory.append( obs0=obs0,
-                            f_s0=full_state0,
-                            action=action,
-                            reward=reward,
-                            obs1=obs1,
-                            f_s1=full_state1,
-                            terminal1=terminal1)
+        if demo:
+            self.memory.append_demo( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
+                                     obs1=obs1, f_s1=full_state1, terminal1=terminal1)
+        self.memory.append( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
+                            obs1=obs1, f_s1=full_state1, terminal1=terminal1)
 
         self.obs_rms.update(np.array([obs0]))
         self.obs_rms.update(np.array([obs1]))

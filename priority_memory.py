@@ -142,6 +142,22 @@ class PrioritizedMemory(Memory):
         self._it_sum[idx] = self._max_priority
         self._it_min[idx] = self._max_priority
 
+    def append_demo(self, obs0, obs1, f_s0, f_s1,
+                    action, reward, terminal1):
+        idx = self._next_idx
+        if not super(PrioritizedMemory, self).append_(obs0=obs0,
+                                                      obs1=obs1,
+                                                      f_s0=f_s0,
+                                                      f_s1=f_s1,
+                                                      actions=action,
+                                                      rewards=reward,
+                                                      terminal1=terminal1,
+                                                      count=False):
+            return
+        self._it_sum[idx] = self._max_priority
+        self._it_min[idx] = self._max_priority
+        self.num_demonstrations += 1
+
     def _sample_proportional(self, batch_size, pretrain):
         res = []
         if pretrain:

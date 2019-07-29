@@ -161,6 +161,27 @@ class KukaDiverseObjectEnv(Kuka):
 
         return full_state
 
+    def demo_policy(self):
+        fs = self.get_full_state()
+        # 随便选一个物体
+        fu_state = {'gripper.x': fs[18],
+                    'gripper.y': fs[19],
+                    'gripper.z': fs[20],
+                    'object1.x': fs[0],
+                    'object1.y': fs[1],
+                    'object1.z': fs[2]}
+
+        action = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+        # move to up of object
+        dx = (fu_state['object1.x'] - fu_state['gripper.x'])
+        dy = (fu_state['object1.y'] - fu_state['gripper.y'])
+        dz = (fu_state['object1.z'] - fu_state['gripper.z']) + 0.01  # 比物体稍稍高一点点
+        action[0] = np.clip(dx, -0.05, 0.05)
+        action[1] = np.clip(dy, -0.05, 0.05)
+        action[2] = np.clip(dz, -0.05, 0.05)
+        action[3] = 0.0
+        return action
+
     def _randomly_place_objects(self, urdfList):
         """Randomly places the objects in the bin.
 
