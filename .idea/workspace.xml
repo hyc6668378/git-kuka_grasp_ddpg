@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +12,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="644">
@@ -29,6 +27,18 @@
                 <element signature="e#4173#4478#0" />
                 <element signature="e#3034#4854#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="667">
+                <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -130,7 +140,6 @@
         <option value="$PROJECT_DIR$/segment_tree.py" />
         <option value="$PROJECT_DIR$/enjoy_kuka_diverse_object_grasping.py" />
         <option value="$PROJECT_DIR$/memory.py" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/mpi_adam.py" />
         <option value="$PROJECT_DIR$/KukaGymEnv.py" />
         <option value="$PROJECT_DIR$/demo_collection.py" />
@@ -139,6 +148,7 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/run_bash.sh" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -312,16 +322,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="332">
           <caret line="1120" column="29" selection-start-line="1120" selection-start-column="18" selection-end-line="1120" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="552">
-            <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -512,6 +512,16 @@
             <element signature="e#4173#4478#0" />
             <element signature="e#3034#4854#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="667">
+            <caret line="29" lean-forward="true" selection-start-line="29" selection-end-line="29" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
