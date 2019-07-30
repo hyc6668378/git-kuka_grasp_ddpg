@@ -10,7 +10,7 @@ from functools import partial
 
 
 conv2_ = partial(tc.layers.conv2d, kernel_size=3, stride=2, padding='valid', activation_fn=None)
-bn = partial(tc.layers.batch_norm, scale=True, updates_collections=None)
+bn = partial(tf.layers.batch_normalization)
 
 def normalize(x, stats):
     if stats is None:
@@ -35,6 +35,8 @@ class DDPG(object):
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
         self.use_n_step = use_n_step
+        self.demo_percent = [] # demo 在 sample中所占比例
+
         if prioritiy:
             self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
         else:
@@ -171,6 +173,7 @@ class DDPG(object):
                 beta=self.beta,
                 gamma=GAMMA
             )
+            self.demo_percent.append(float(percentage))
         else:
             batch = self.memory.sample(batch_size=self.batch_size)
 
@@ -212,7 +215,6 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
 
-        # TODO: 更新 actor时候 试一试 用 target net 算 q
         _, a_s, = self.sess.run([self.atrain, self.a_summary],
                               {self.observe_Input: batch['obs0'],
                                     self.q_demo: q_demo,
@@ -257,7 +259,7 @@ class DDPG(object):
         self.pointer += 1
 
     def build_actor(self, observe_input, scope, trainable, is_training=True):
-        bn_a = partial(bn, is_training=is_training)
+        bn_a = partial(bn, trainable=trainable, training=is_training)
         fc_a = partial(tf.layers.dense, activation=None, trainable=trainable)
         conv2_a = partial( conv2_, trainable=trainable)
         relu = partial(tf.nn.relu)
@@ -287,7 +289,7 @@ class DDPG(object):
             return action_output
 
     def build_critic(self, f_s, a, scope, trainable, is_training=True):
-        bn_a = partial(bn, is_training=is_training)
+        bn_a = partial(bn, trainable=trainable, training=is_training)
         relu = partial(tf.nn.relu)
         fc_c = partial(tf.layers.dense, activation=None, trainable=trainable)
         with tf.variable_scope(scope):

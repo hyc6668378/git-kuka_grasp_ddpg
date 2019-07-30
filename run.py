@@ -53,10 +53,11 @@ def set_global_seeds(myseed):
     np.random.seed(myseed)
     random.seed(myseed)
 
-def save_all(succ_list, steps_list):
+def save_all(succ_list, steps_list, demo_per):
     ddpg_agent.Save()  # save the model
     np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
     np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
+    np.save("result/" + args.experiment_name + "_demo_percentage", demo_per)
 
 def Noise_Action(action):
     noise = Noise.sample()
@@ -147,7 +148,7 @@ def train(max_episodes):
             steps_list = np.append(steps_list,i)
             print("\nepisode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
             learn_graspsuccess = 0.
-            save_all(succ_list, steps_list)
+            save_all(succ_list, steps_list, ddpg_agent.demo_percent)
     return succ_list, steps_list
 
 def main():
@@ -163,7 +164,7 @@ def main():
 
     succ_list, steps_list = train( args.max_episodes )
 
-    save_all( succ_list, steps_list )
+    save_all( succ_list, steps_list, ddpg_agent.demo_percent)
     plot( succ_list, steps_list )
     print("total Running time:{:.2f}(h) ".format((time.time() - t1)/3600.))
 
