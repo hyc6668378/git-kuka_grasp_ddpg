@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-    </list>
+    <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +27,7 @@
         <entry file="file://$PROJECT_DIR$/ddpg.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="446">
-              <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
+              <caret line="154" lean-forward="true" selection-start-line="154" selection-end-line="154" />
               <folding>
                 <element signature="e#16#39#0" expanded="true" />
                 <element signature="e#489#563#0" />
@@ -42,7 +39,6 @@
                 <element signature="e#5951#6126#0" />
                 <element signature="e#6207#6244#0" />
                 <element signature="e#6383#6724#0" />
-                <element signature="e#8151#8272#0" />
                 <element signature="e#8302#8404#0" />
                 <element signature="e#8434#8493#0" />
                 <element signature="e#8955#9170#0" />
@@ -479,7 +475,7 @@
     <entry file="file://$PROJECT_DIR$/ddpg.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="446">
-          <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
+          <caret line="154" lean-forward="true" selection-start-line="154" selection-end-line="154" />
           <folding>
             <element signature="e#16#39#0" expanded="true" />
             <element signature="e#489#563#0" />
@@ -491,7 +487,6 @@
             <element signature="e#5951#6126#0" />
             <element signature="e#6207#6244#0" />
             <element signature="e#6383#6724#0" />
-            <element signature="e#8151#8272#0" />
             <element signature="e#8302#8404#0" />
             <element signature="e#8434#8493#0" />
             <element signature="e#8955#9170#0" />
