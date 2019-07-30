@@ -243,7 +243,8 @@ class DDPG(object):
         if demo:
             self.memory.append_demo( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
                                      obs1=obs1, f_s1=full_state1, terminal1=terminal1)
-        self.memory.append( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
+        else:
+            self.memory.append( obs0=obs0, f_s0=full_state0, action=action, reward=reward,
                             obs1=obs1, f_s1=full_state1, terminal1=terminal1)
 
         # 增量式的更新observe的均值标准差

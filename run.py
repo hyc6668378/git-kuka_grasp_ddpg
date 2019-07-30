@@ -145,7 +145,7 @@ def train(max_episodes):
         if i % 50 == 0:
             succ_list = np.append(succ_list, learn_graspsuccess)
             steps_list = np.append(steps_list,i)
-            print("episode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
+            print("\nepisode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
             learn_graspsuccess = 0.
             save_all(succ_list, steps_list)
     return succ_list, steps_list

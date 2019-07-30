@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/priority_memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/priority_memory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +17,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="630">
-              <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
+            <state relative-caret-position="423">
+              <caret line="131" selection-start-line="131" selection-end-line="131" />
               <folding>
                 <element signature="e#15#24#0" expanded="true" />
                 <element signature="e#288#1826#0" />
@@ -27,11 +27,87 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ddpg.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="584">
+              <caret line="248" selection-start-line="248" selection-end-line="248" />
+              <folding>
+                <element signature="e#489#563#0" />
+                <element signature="e#1089#8107#0" />
+                <element signature="e#1367#1553#0" />
+                <element signature="e#3106#3363#0" />
+                <element signature="e#3424#3554#0" />
+                <element signature="e#3609#3940#0" />
+                <element signature="e#3996#4309#0" />
+                <element signature="e#4837#5068#0" />
+                <element signature="e#5206#6197#0" />
+                <element signature="e#5951#6126#0" />
+                <element signature="e#6207#6244#0" />
+                <element signature="e#6383#6724#0" />
+                <element signature="e#7072#7214#0" />
+                <element signature="e#7910#8025#0" />
+                <element signature="e#8151#8272#0" />
+                <element signature="e#8302#8404#0" />
+                <element signature="e#8434#8493#0" />
+                <element signature="e#8955#9170#0" />
+                <element signature="e#9235#10107#0" />
+                <element signature="e#9332#9672#0" />
+                <element signature="e#9825#10106#0" />
+                <element signature="e#10134#10495#0" />
+                <element signature="e#10272#10494#0" />
+                <element signature="e#10638#10938#0" />
+                <element signature="e#12418#13694#0" />
+                <element signature="e#12682#13694#0" />
+                <element signature="e#13533#13555#0" />
+                <element signature="e#13776#14358#0" />
+                <element signature="e#13985#14358#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/priority_memory.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="460">
+              <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
+              <folding>
+                <element signature="e#137#235#0" />
+                <element signature="e#780#949#0" />
+                <element signature="e#1647#1898#0" />
+                <element signature="e#2415#2834#0" />
+                <element signature="e#2425#2516#0" />
+                <element signature="e#2553#2747#0" />
+                <element signature="e#2879#3292#0" />
+                <element signature="e#3337#3371#0" />
+                <element signature="e#3573#4066#0" />
+                <element signature="e#5815#6323#0" />
+                <element signature="e#5857#5978#0" />
+                <element signature="e#6027#6304#0" />
+                <element signature="e#6055#6304#0" />
+                <element signature="e#6263#6304#0" />
+                <element signature="e#6389#7105#0" />
+                <element signature="e#6653#6798#0" />
+                <element signature="e#7195#8733#0" />
+                <element signature="e#7270#7373#0" />
+                <element signature="e#7489#8447#0" />
+                <element signature="e#7847#8004#0" />
+                <element signature="e#7964#8004#0" />
+                <element signature="e#8569#8657#0" />
+                <element signature="e#8812#9513#0" />
+                <element signature="e#8957#9068#0" />
+                <element signature="e#9179#9513#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run_bash.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="92">
-              <caret line="4" column="11" lean-forward="true" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
+              <caret line="4" column="11" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -59,16 +135,16 @@
         <option value="$PROJECT_DIR$/mpi_adam.py" />
         <option value="$PROJECT_DIR$/KukaGymEnv.py" />
         <option value="$PROJECT_DIR$/demo_collection.py" />
-        <option value="$PROJECT_DIR$/priority_memory.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/run.py" />
-        <option value="$PROJECT_DIR$/ddpg.py" />
         <option value="$PROJECT_DIR$/run_bash.sh" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/priority_memory.py" />
+        <option value="$PROJECT_DIR$/ddpg.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1830" />
     <option name="y" value="-14" />
     <option name="width" value="1855" />
@@ -331,42 +407,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/priority_memory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="144" column="19" selection-start-line="144" selection-start-column="8" selection-end-line="144" selection-end-column="19" />
-          <folding>
-            <element signature="e#137#235#0" />
-            <element signature="e#780#949#0" />
-            <element signature="e#1038#1062#0" />
-            <element signature="e#2415#2834#0" />
-            <element signature="e#2425#2516#0" />
-            <element signature="e#2553#2747#0" />
-            <element signature="e#2879#3292#0" />
-            <element signature="e#3337#3371#0" />
-            <element signature="e#3573#4066#0" />
-            <element signature="e#4255#4926#0" />
-            <element signature="e#5250#5779#0" />
-            <element signature="e#4994#5502#0" />
-            <element signature="e#5036#5157#0" />
-            <element signature="e#5206#5483#0" />
-            <element signature="e#5234#5483#0" />
-            <element signature="e#5442#5483#0" />
-            <element signature="e#5568#6284#0" />
-            <element signature="e#5832#5977#0" />
-            <element signature="e#6374#7912#0" />
-            <element signature="e#6449#6552#0" />
-            <element signature="e#6668#7626#0" />
-            <element signature="e#7026#7183#0" />
-            <element signature="e#7143#7183#0" />
-            <element signature="e#7748#7836#0" />
-            <element signature="e#7991#8692#0" />
-            <element signature="e#8136#8247#0" />
-            <element signature="e#8358#8692#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/summary/summary.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="640">
@@ -381,35 +421,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg.py">
+    <entry file="file://$PROJECT_DIR$/run_bash.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="483">
-          <caret line="30" column="19" lean-forward="true" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
-          <folding>
-            <element signature="e#543#617#0" />
-            <element signature="e#1342#1520#0" />
-            <element signature="e#2798#3055#0" />
-            <element signature="e#3116#3246#0" />
-            <element signature="e#6920#7041#0" />
-            <element signature="e#7071#7173#0" />
-            <element signature="e#7203#7262#0" />
-            <element signature="e#7327#7549#0" />
-            <element signature="e#7724#7939#0" />
-            <element signature="e#9924#10695#0" />
-            <element signature="e#10129#10299#0" />
-            <element signature="e#10783#12059#0" />
-            <element signature="e#11047#12059#0" />
-            <element signature="e#11898#11920#0" />
-            <element signature="e#12141#12723#0" />
-            <element signature="e#12350#12723#0" />
-          </folding>
+        <state relative-caret-position="92">
+          <caret line="4" column="11" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
+        <state relative-caret-position="423">
+          <caret line="131" selection-start-line="131" selection-end-line="131" />
           <folding>
             <element signature="e#15#24#0" expanded="true" />
             <element signature="e#288#1826#0" />
@@ -417,10 +439,75 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run_bash.sh">
+    <entry file="file://$PROJECT_DIR$/ddpg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="4" column="11" lean-forward="true" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
+        <state relative-caret-position="584">
+          <caret line="248" selection-start-line="248" selection-end-line="248" />
+          <folding>
+            <element signature="e#489#563#0" />
+            <element signature="e#1089#8107#0" />
+            <element signature="e#1367#1553#0" />
+            <element signature="e#3106#3363#0" />
+            <element signature="e#3424#3554#0" />
+            <element signature="e#3609#3940#0" />
+            <element signature="e#3996#4309#0" />
+            <element signature="e#4837#5068#0" />
+            <element signature="e#5206#6197#0" />
+            <element signature="e#5951#6126#0" />
+            <element signature="e#6207#6244#0" />
+            <element signature="e#6383#6724#0" />
+            <element signature="e#7072#7214#0" />
+            <element signature="e#7910#8025#0" />
+            <element signature="e#8151#8272#0" />
+            <element signature="e#8302#8404#0" />
+            <element signature="e#8434#8493#0" />
+            <element signature="e#8955#9170#0" />
+            <element signature="e#9235#10107#0" />
+            <element signature="e#9332#9672#0" />
+            <element signature="e#9825#10106#0" />
+            <element signature="e#10134#10495#0" />
+            <element signature="e#10272#10494#0" />
+            <element signature="e#10638#10938#0" />
+            <element signature="e#12418#13694#0" />
+            <element signature="e#12682#13694#0" />
+            <element signature="e#13533#13555#0" />
+            <element signature="e#13776#14358#0" />
+            <element signature="e#13985#14358#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/priority_memory.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="460">
+          <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
+          <folding>
+            <element signature="e#137#235#0" />
+            <element signature="e#780#949#0" />
+            <element signature="e#1647#1898#0" />
+            <element signature="e#2415#2834#0" />
+            <element signature="e#2425#2516#0" />
+            <element signature="e#2553#2747#0" />
+            <element signature="e#2879#3292#0" />
+            <element signature="e#3337#3371#0" />
+            <element signature="e#3573#4066#0" />
+            <element signature="e#5815#6323#0" />
+            <element signature="e#5857#5978#0" />
+            <element signature="e#6027#6304#0" />
+            <element signature="e#6055#6304#0" />
+            <element signature="e#6263#6304#0" />
+            <element signature="e#6389#7105#0" />
+            <element signature="e#6653#6798#0" />
+            <element signature="e#7195#8733#0" />
+            <element signature="e#7270#7373#0" />
+            <element signature="e#7489#8447#0" />
+            <element signature="e#7847#8004#0" />
+            <element signature="e#7964#8004#0" />
+            <element signature="e#8569#8657#0" />
+            <element signature="e#8812#9513#0" />
+            <element signature="e#8957#9068#0" />
+            <element signature="e#9179#9513#0" />
+          </folding>
         </state>
       </provider>
     </entry>

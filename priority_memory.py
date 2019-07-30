@@ -72,6 +72,7 @@ class Memory(object):
         else:
             self.storage[self._next_idx] = entry # cover the old transition
         self._next_idx = int(self._next_idx + 1)
+
         if self._next_idx >= self.capacity:
             self._next_idx = self.num_demonstrations # TODO: 从头覆盖会影响到 n-step return 的终点判断. 需要优化
         return True
