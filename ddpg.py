@@ -153,7 +153,8 @@ class DDPG(object):
 
     def choose_action(self, obs):
         obs = obs.astype(dtype=np.float32)
-        return self.sess.run(self.action, {self.observe_Input: obs[np.newaxis, :]})[0]
+        # 用 稳定的 actor target net 生成动作与环境交互.
+        return self.sess.run(self.action_, {self.observe_Input_: obs[np.newaxis, :]})[0]
 
     def Save(self):
         # 只存权重,不存计算图.
