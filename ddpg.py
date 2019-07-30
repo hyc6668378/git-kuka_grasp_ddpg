@@ -24,17 +24,20 @@ LR_A = 0.0001       # learning rate for actor
 LR_C = 0.001        # learning rate for critic
 GAMMA = 0.99        # reward discount
 TAU = 0.005         # soft replacement
-LAMBDA_BC = 0.5     # behavior clone weitht
+LAMBDA_BC = 100.0     # behavior clone weitht
 
 # -----------------------------  DDPG ---------------------------------------------
 
 class DDPG(object):
-    def __init__(self, memory_capacity, batch_size, prioritiy,
-                 alpha=0.2, use_n_step=False, n_step_return=5, is_training=True):
+    def __init__(self, memory_capacity, batch_size, prioritiy, noise_target_action=False,
+                 alpha=0.2, use_n_step=False, n_step_return=5, is_training=True,
+                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
         self.use_n_step = use_n_step
+        self.LAMBDA_BC = LAMBDA_BC
+        self.use_TD3 = use_TD3
         self.demo_percent = [] # demo 在 sample中所占比例
 
         if prioritiy:
@@ -45,9 +48,14 @@ class DDPG(object):
                                  full_state_shape=(24, ))
         self.pointer = 0                        # memory 计数器　
         self.sess = tf.InteractiveSession()     # 创建一个默认会话
-        self.lambda_1step = 0.5                 # 1_step_return_loss的权重
-        self.lambda_nstep = 0.5                 # n_step_return_loss的权重
+        self.lambda_1_step = 0.5                 # 1_step_return_loss的权重
+        self.lambda_n_step = 0.5                 # n_step_return_loss的权重
         self.beta = 0.6
+        self.act_limit = np.array([0.05, 0.05, 0.05, np.radians(90)])
+
+        # actor 比 critic 更新频率小
+        self.policy_delay_iterate = 0
+        self.policy_delay = policy_delay
 
         # 定义 placeholders
         self.observe_Input = tf.placeholder(tf.float32, [None, 128, 128, 3], name='observe_Input')
@@ -81,55 +89,106 @@ class DDPG(object):
             self.action_ = self.build_actor(self.normalized_observe_Input_,
                                             scope='target', trainable=False, is_training=False)
 
+            # Target policy smoothing, by adding clipped noise to target actions
+            if noise_target_action:
+                epsilon = tf.random_normal(tf.shape(self.action_), stddev=0.02)
+                epsilon = tf.clip_by_value(epsilon, -0.01, 0.01)
+                a2 = self.action_ + epsilon
+                noised_action_ = tf.clip_by_value(a2, -self.act_limit, self.act_limit)
+            else:
+                noised_action_ = self.action_
+
         with tf.variable_scope('Critic'):
-            self.q = self.build_critic(self.normalized_f_s0, self.action,
-                                       scope='eval', trainable=True, is_training=is_training)
-            q_ = self.build_critic(self.normalized_f_s1, self.action_,
-                                   scope='target', trainable=False, is_training=False)
+            self.q_1 = self.build_critic(self.normalized_f_s0, self.action,
+                                         scope='eval_1', trainable=True, is_training=is_training)
+            q_1_ = self.build_critic(self.normalized_f_s1, noised_action_,
+                                     scope='target_1', trainable=False, is_training=False)
+
+            if self.use_TD3:
+                q_2 = self.build_critic(self.normalized_f_s0, self.action,
+                                        scope='eval_2', trainable=True, is_training=is_training)
+                q_2_ = self.build_critic(self.normalized_f_s1, noised_action_,
+                                   scope='target_2', trainable=False, is_training=False)
 
         # Collect networks parameters. It would make it more easily to manage them.
         self.ae_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/eval')
         self.at_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/target')
-        self.ce_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/eval')
-        self.ct_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/target')
+        self.ce1_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/eval_1')
+        self.ct1_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/target_1')
+
+        if self.use_TD3:
+            self.ce2_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/eval_2')
+            self.ct2_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Critic/target_2')
 
         with tf.variable_scope('Soft_Update'):
             self.soft_replace_a = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.at_params, self.ae_params)]
-            self.soft_replace_c = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.ct_params, self.ce_params)]
+            self.soft_replace_c = [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.ct1_params, self.ce1_params)]
+            if self.use_TD3:
+                self.soft_replace_c += [tf.assign(t, (1 - TAU) * t + TAU * e) for t, e in zip(self.ct2_params, self.ce2_params)]
 
         # critic 的误差 为 (one-step-td 误差 + n-step-td 误差 + critic_online 的L2惩罚)
+        # TD3: critic一共有4个, 算两套 critic的误差, 秀儿.
         with tf.variable_scope('Critic_Lose'):
-            self.q_target = self.R + (1. - self.terminals1) * GAMMA * q_
-
-            if self.use_n_step:
-                self.n_step_target_q = self.R + (1. - self.terminals1) * tf.pow(GAMMA, self.n_step_steps) * q_
-            self.td_error = tf.abs(self.q_target - self.q)
-
-            if self.use_n_step:
-                self.nstep_td_error = tf.abs(self.n_step_target_q - self.q)
-
-            L2_regular = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
-                                                                     weights_list=self.ce_params)
-            one_step_losse = tf.reduce_mean(tf.multiply(self.ISWeights, tf.square(self.td_error))) * self.lambda_1step
-
-            if self.use_n_step:
-                n_step_td_losses = tf.reduce_mean(tf.multiply(self.ISWeights, self.nstep_td_error)) * self.lambda_nstep
-                c_loss = one_step_losse + n_step_td_losses + L2_regular
+            if self.use_TD3:
+                min_q_ = tf.minimum(q_1_, q_2_)
             else:
-                c_loss = one_step_losse + L2_regular
+                min_q_ = q_1_
+            self.q_target = self.R + (1. - self.terminals1) * GAMMA * min_q_
+            if self.use_n_step:
+                self.n_step_target_q = self.R + (1. - self.terminals1) * tf.pow(GAMMA, self.n_step_steps) * min_q_
+
+            self.td_error_1 = tf.abs(self.q_target - self.q_1)
+            if self.use_TD3:
+                self.td_error_2 = tf.abs(self.q_target - q_2)
+
+            if self.use_n_step:
+                self.nstep_td_error_1 = tf.abs(self.n_step_target_q - self.q_1)
+                if self.use_TD3:
+                    self.nstep_td_error_2 = tf.abs(self.n_step_target_q - q_2)
+
+            L2_regular_1 = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
+                                                                weights_list=self.ce1_params)
+            if self.use_TD3:
+                L2_regular_2 = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
+                                                                  weights_list=self.ce2_params)
+
+            one_step_losse_1 = tf.reduce_mean(
+                tf.multiply(self.ISWeights, tf.square(self.td_error_1))) * self.lambda_1_step
+            if self.use_TD3:
+                one_step_losse_2 = tf.reduce_mean(
+                    tf.multiply(self.ISWeights, tf.square(self.td_error_2))) * self.lambda_1_step
+
+            if self.use_n_step:
+                n_step_td_losses_1 = tf.reduce_mean(
+                    tf.multiply(self.ISWeights, self.nstep_td_error_1)) * self.lambda_n_step
+                c_loss_1 = one_step_losse_1 + n_step_td_losses_1 + L2_regular_1
+
+                if self.use_TD3:
+                    n_step_td_losses_2 = tf.reduce_mean(
+                        tf.multiply(self.ISWeights, self.nstep_td_error_2)) * self.lambda_n_step
+                    c_loss_2 = one_step_losse_2 + n_step_td_losses_2 + L2_regular_2
+            else:
+                c_loss_1 = one_step_losse_1 + L2_regular_1
+
+                if self.use_TD3:
+                    c_loss_2 = one_step_losse_2 + L2_regular_2
 
         # actor 的 loss 为 最大化q(s,a) 最小化行为克隆误差.
-        # (只有demo的transition 且 demo的action 比 actor生成的action q(s,a)高的时候 才会有克隆误差)
+        # (只有demo的transition 且 demo的action 比 actor生成的action q_1(s,a)高的时候 才会有克隆误差)
         with tf.variable_scope('Actor_lose'):
-            Is_worse_than_demo = self.q < self.q_demo
+            Is_worse_than_demo = self.q_1 < self.q_demo
             action_diffs = tf.cast(Is_worse_than_demo, tf.float32) * tf.reduce_mean(
                 self.come_from_demo * tf.square(self.action - self.action_memory), 1, keep_dims=True)
-            L_BC = LAMBDA_BC * tf.reduce_mean(action_diffs)
-            a_loss = - tf.reduce_mean(self.q) + L_BC
+            L_BC = self.LAMBDA_BC * tf.reduce_mean(action_diffs)
+            a_loss = - tf.reduce_mean(self.q_1) + L_BC
 
         # Setting optimizer for Actor and Critic
         with tf.variable_scope('Critic_Optimizer'):
-            self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss, var_list=self.ce_params)
+            self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params)
+            if self.use_TD3:
+                self.ctrain = tf.group(self.ctrain,
+                                tf.train.AdamOptimizer(LR_C).minimize(c_loss_2, var_list=self.ce2_params),
+                                name="ctrain")
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS) # batch-normal 参数更新
         with tf.variable_scope('Actor_Optimizer'):
@@ -139,10 +198,12 @@ class DDPG(object):
         self.sess.run(tf.global_variables_initializer())
 
         #  init_target net-work with evaluate net-params
-        self.init_a_t = [tf.assign(t, e) for t, e in zip(self.at_params, self.ae_params)]
-        self.init_c_t = [tf.assign(t, e) for t, e in zip(self.ct_params, self.ce_params)]
-        self.sess.run(self.init_a_t)
-        self.sess.run(self.init_c_t)
+        init_a_t = [tf.assign(t, e) for t, e in zip(self.at_params, self.ae_params)]
+        init_c_t = [tf.assign(t, e) for t, e in zip(self.ct1_params, self.ce1_params)]
+        if self.use_TD3:
+            init_c_t +=[tf.assign(t, e) for t, e in zip(self.ct2_params, self.ce2_params)]
+        self.sess.run( init_a_t )
+        self.sess.run( init_c_t )
 
         # 保存模型
         var_list = [var for var in tf.global_variables() if "moving" in var.name]
@@ -151,9 +212,10 @@ class DDPG(object):
         self.writer = tf.summary.FileWriter("logs/", self.sess.graph)
         self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss),
                                            tf.summary.scalar('L_BC',   L_BC)])
-        self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss', c_loss)])
+        self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1),
+                                           tf.summary.scalar('c_loss_2', c_loss_2)])
 
-    def choose_action(self, obs):
+    def pi(self, obs):
         obs = obs.astype(dtype=np.float32)
         # 用 稳定的 actor target net 生成动作与环境交互.
         return self.sess.run(self.action_, {self.observe_Input_: obs[np.newaxis, :]})[0]
@@ -186,6 +248,11 @@ class DDPG(object):
                 self.f_s_: batch['f_s1']
                        })
 
+        if self.use_TD3:
+            opt = [self.td_error_1, self.td_error_2, self.ctrain, self.c_summary, self.q_1]
+        else:
+            opt = [self.td_error_1, self.ctrain, self.c_summary, self.q_1]
+
         if self.is_prioritiy and self.use_n_step:
             n_step_target_q = self.sess.run(
                 self.n_step_target_q,
@@ -196,9 +263,8 @@ class DDPG(object):
                            self.f_s_: n_step_batch['f_s1']
                            })
 
-            td_error, _, c_s, q_demo = self.sess.run(
-                [self.td_error, self.ctrain, self.c_summary, self.q],
-                feed_dict={
+            res = self.sess.run(
+                opt, feed_dict={
                     self.q_target: one_step_target_q,
                     self.n_step_target_q: n_step_target_q,
                     self.f_s: batch['f_s0'],
@@ -206,29 +272,38 @@ class DDPG(object):
                     self.ISWeights: batch['weights']
                 })
         else:
-            td_error, _, c_s, q_demo = self.sess.run(
-                [self.td_error, self.ctrain, self.c_summary, self.q],
-                feed_dict={
+            res = self.sess.run(
+                opt, feed_dict={
                     self.q_target: one_step_target_q,
                     self.f_s: batch['f_s0'],
                     self.action: batch['actions'],
                     self.ISWeights: batch['weights']
                 })
 
-        _, a_s, = self.sess.run([self.atrain, self.a_summary],
-                              {self.observe_Input: batch['obs0'],
+        if self.use_TD3:
+            td_error_1, td_error_2, _, c_s, q_demo = res
+            td_error = (td_error_1 + td_error_2) / 2.0
+        else:
+            td_error, _, c_s, q_demo = res
+
+        # actor update
+        if self.policy_delay_iterate % self.policy_delay == 0:
+            _, a_s, = self.sess.run([self.atrain, self.a_summary],
+                                   {self.observe_Input: batch['obs0'],
                                     self.q_demo: q_demo,
                                     self.f_s: batch['f_s0'],
                                     self.come_from_demo: batch['demos'],
                                     self.action_memory: batch['actions']})
+            self.writer.add_summary(a_s)
+            self.policy_delay_iterate += 1
+            self.sess.run(self.soft_replace_a)
 
         if self.is_prioritiy:
-            self.memory.update_priorities(batch['idxes'], td_errors=td_error)
+            self.memory.update_priorities(batch['idxes'], td_errors= td_error )
 
-        self.sess.run(self.soft_replace_a)
         self.sess.run(self.soft_replace_c)
+
         self.writer.add_summary(c_s)
-        self.writer.add_summary(a_s)
 
     def store_transition(self,
                          obs0,
@@ -280,7 +355,7 @@ class DDPG(object):
                                   kernel_initializer=tf.initializers.random_uniform(minval=-0.0003,
                                                                                     maxval=0.0003))
             #输出(1,4)
-            action_output = action_output * np.array([0.05, 0.05, 0.05, np.radians(90)])
+            action_output = action_output * self.act_limit
             # dx a[0] (-0.05,0.05)
             # dy a[1] (-0.05,0.05)
             # dz a[2] (-0.05,0.05)

@@ -28,16 +28,22 @@ def common_arg_parser():
     parser.add_argument('--Demo_CAPACITY', type=int, default=2000, help="The number of demo transitions. default = 2000")
     parser.add_argument('--PreTrain_STEPS', type=int, default=2000, help="The steps for PreTrain. default = 2000")
     parser.add_argument('--max_episodes', type=int, default=8000, help="The Max episodes. default = 8000")
-    return  parser
+    parser.add_argument("--noise_target_action", help="noise target_action for Target policy smoothing", action="store_true")
+    parser.add_argument("--LAMBDA_BC", type=int, default=100, help="behavior clone weitht. default = 100.0")
+    parser.add_argument("--policy_delay", type=int, default=2, help="policy update delay w.r.t critic update. default = 2")
+    parser.add_argument("--use_TD3", help="使用TD3 避免过估计", action="store_true")
+
+    return parser
 
 parser = common_arg_parser()
 args = parser.parse_args()
 
 
-ddpg_agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
-                  prioritiy=args.priority, alpha=args.alpha,
-                  use_n_step=args.use_n_step, n_step_return=args.n_step_return,
-                  is_training=True)
+agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
+             prioritiy=args.priority, noise_target_action=args.noise_target_action,
+             alpha=args.alpha, use_n_step=args.use_n_step, n_step_return=args.n_step_return,
+             is_training=True, LAMBDA_BC=args.LAMBDA_BC, policy_delay=args.policy_delay,
+             use_TD3=args.use_TD3)
 
 env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
@@ -54,7 +60,7 @@ def set_global_seeds(myseed):
     random.seed(myseed)
 
 def save_all(succ_list, steps_list, demo_per):
-    ddpg_agent.Save()  # save the model
+    agent.Save()  # save the model
     np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
     np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
     np.save("result/" + args.experiment_name + "_demo_percentage", demo_per)
@@ -85,21 +91,21 @@ def demo_collect(Demo_CAPACITY):
         demo_tran_file_path = 'all_demo/demo%d.npy' % (i)
         transition = np.load(demo_tran_file_path, allow_pickle=True)
         transition = transition.tolist()
-        ddpg_agent.store_transition(full_state0=transition['f_s0'],
-                                    obs0=transition['obs0'],
-                                    action=transition['action'],
-                                    reward=transition['reward'],
-                                    full_state1=transition['f_s1'],
-                                    obs1=transition['obs1'],
-                                    terminal1=transition['terminal1'],
-                                    demo = True)
+        agent.store_transition(full_state0=transition['f_s0'],
+                               obs0=transition['obs0'],
+                               action=transition['action'],
+                               reward=transition['reward'],
+                               full_state1=transition['f_s1'],
+                               obs1=transition['obs1'],
+                               terminal1=transition['terminal1'],
+                               demo = True)
     print(" Demo Collection completed.")
 
 def preTrain(PreTrain_STEPS):
     print("\n PreTraining ...")
 
     for _ in tqdm(range(PreTrain_STEPS)):
-        ddpg_agent.learn()
+        agent.learn()
 
     print(" PreTraining completed.")
 
@@ -112,28 +118,28 @@ def train(max_episodes):
         f_s0 = env.get_full_state()
         for j in range(args.max_ep_steps):
 
-            action = ddpg_agent.choose_action(obs0)
-            action = Noise_Action(action)
+            action = agent.pi( obs0 )
+            action = Noise_Action( action )
 
-            obs1, reward, done, info = env.step(action)
+            obs1, reward, done, info = env.step( action )
             f_s1 = env.get_full_state()
 
-            ddpg_agent.store_transition(full_state0=f_s0,
-                                        obs0=obs0,
-                                        action=action,
-                                        reward=reward,
-                                        full_state1=f_s1,
-                                        obs1=obs1,
-                                        terminal1=done)
+            agent.store_transition(full_state0=f_s0,
+                                   obs0=obs0,
+                                   action=action,
+                                   reward=reward,
+                                   full_state1=f_s1,
+                                   obs1=obs1,
+                                   terminal1=done)
             obs0 = obs1
             f_s0 = f_s1
 
             if info['grasp_success'] == 1:
                 learn_graspsuccess += 1
 
-            if ddpg_agent.pointer > args.memory_size:
+            if agent.pointer > args.memory_size:
                 for _ in range(args.inter_learn_steps):
-                    ddpg_agent.learn()
+                    agent.learn()
             if done:
                 break
 
@@ -141,14 +147,14 @@ def train(max_episodes):
         Noise.theta = np.linspace(0.05, 0.0, max_episodes)[i]
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
         if args.turn_beta:
-            ddpg_agent.beta = np.linspace(0.6, 1.0, max_episodes)[i]
+            agent.beta = np.linspace(0.6, 1.0, max_episodes)[i]
 
         if i % 50 == 0:
             succ_list = np.append(succ_list, learn_graspsuccess)
             steps_list = np.append(steps_list,i)
             print("\nepisode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
             learn_graspsuccess = 0.
-            save_all(succ_list, steps_list, ddpg_agent.demo_percent)
+            save_all(succ_list, steps_list, agent.demo_percent)
     return succ_list, steps_list
 
 def main():
@@ -164,7 +170,7 @@ def main():
 
     succ_list, steps_list = train( args.max_episodes )
 
-    save_all( succ_list, steps_list, ddpg_agent.demo_percent)
+    save_all(succ_list, steps_list, agent.demo_percent)
     plot( succ_list, steps_list )
     print("total Running time:{:.2f}(h) ".format((time.time() - t1)/3600.))
 
