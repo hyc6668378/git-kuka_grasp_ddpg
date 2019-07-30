@@ -43,7 +43,7 @@ agent = DDPG(memory_capacity=args.memory_size, batch_size=args.batch_size,
              prioritiy=args.priority, noise_target_action=args.noise_target_action,
              alpha=args.alpha, use_n_step=args.use_n_step, n_step_return=args.n_step_return,
              is_training=True, LAMBDA_BC=args.LAMBDA_BC, policy_delay=args.policy_delay,
-             use_TD3=args.use_TD3)
+             use_TD3=args.use_TD3, experiment_name=args.experiment_name)
 
 env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            isDiscrete=False,
@@ -61,9 +61,9 @@ def set_global_seeds(myseed):
 
 def save_all(succ_list, steps_list, demo_per):
     agent.Save()  # save the model
-    np.save("result/" + args.experiment_name + "_succ_list.npy", succ_list)
-    np.save("result/" + args.experiment_name + "_steps_list.npy", steps_list)
-    np.save("result/" + args.experiment_name + "_demo_percentage", demo_per)
+    np.save("result/" + args.experiment_name + "/" + args.experiment_name + "_succ_list.npy", succ_list)
+    np.save("result/" + args.experiment_name + "/" + args.experiment_name + "_steps_list.npy", steps_list)
+    np.save("result/" + args.experiment_name + "/" + args.experiment_name + "_demo_percentage", demo_per)
 
 def Noise_Action(action):
     noise = Noise.sample()
@@ -81,7 +81,7 @@ def plot(succ_list, steps_list):
     plt.legend()
     plt.xlabel('train_Episode')
     plt.ylabel('success rate')
-    plt.savefig('result/'+args.experiment_name+'.png')
+    plt.savefig('result/'+args.experiment_name+'/'+args.experiment_name+'.png')
 
 def demo_collect(Demo_CAPACITY):
 
@@ -157,8 +157,24 @@ def train(max_episodes):
             save_all(succ_list, steps_list, agent.demo_percent)
     return succ_list, steps_list
 
+def mkdir(experiment_name):
+    folder = os.path.exists("logs/"+experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+            os.makedirs("logs/"+experiment_name)
+
+    folder = os.path.exists("result/" + experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs("result/" + experiment_name)
+
+    folder = os.path.exists("model/" + experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs("model/" + experiment_name)
+
 def main():
     t1 = time.time()
+
+    # 生成实验文件夹
+    mkdir(args.experiment_name)
 
     set_global_seeds(args.seed)
 

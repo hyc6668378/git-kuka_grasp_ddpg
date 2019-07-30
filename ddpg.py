@@ -31,15 +31,16 @@ LAMBDA_BC = 100.0     # behavior clone weitht
 class DDPG(object):
     def __init__(self, memory_capacity, batch_size, prioritiy, noise_target_action=False,
                  alpha=0.2, use_n_step=False, n_step_return=5, is_training=True,
-                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False):
+                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False, experiment_name='none'):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
         self.use_n_step = use_n_step
         self.LAMBDA_BC = LAMBDA_BC
         self.use_TD3 = use_TD3
-        self.demo_percent = [] # demo 在 sample中所占比例
+        self.experiment_name = experiment_name
 
+        self.demo_percent = [] # demo 在 sample中所占比例
         if prioritiy:
             self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
         else:
@@ -209,11 +210,14 @@ class DDPG(object):
         var_list = [var for var in tf.global_variables() if "moving" in var.name]
         var_list += tf.trainable_variables()
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
-        self.writer = tf.summary.FileWriter("logs/", self.sess.graph)
-        self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss),
-                                           tf.summary.scalar('L_BC',   L_BC)])
-        self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1),
-                                           tf.summary.scalar('c_loss_2', c_loss_2)])
+        self.writer = tf.summary.FileWriter("logs/" + self.experiment_name + "/", self.sess.graph)
+        self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss, family='actor'),
+                                           tf.summary.scalar('L_BC',   L_BC, family='actor')])
+        if self.use_TD3:
+            self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic'),
+                                               tf.summary.scalar('c_loss_2', c_loss_2, family='critic')])
+        else:
+            self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic')])
 
     def pi(self, obs):
         obs = obs.astype(dtype=np.float32)
@@ -222,10 +226,10 @@ class DDPG(object):
 
     def Save(self):
         # 只存权重,不存计算图.
-        self.saver.save(self.sess, save_path="model/model.ckpt", write_meta_graph=False)
+        self.saver.save(self.sess, save_path="model/" + self.experiment_name + "/model.ckpt", write_meta_graph=False)
 
     def load(self):
-        self.saver.restore(self.sess, save_path="model/model.ckpt")
+        self.saver.restore(self.sess, save_path="model/" + self.experiment_name + "/model.ckpt")
 
     def learn(self):
         if self.is_prioritiy:
@@ -294,16 +298,16 @@ class DDPG(object):
                                     self.f_s: batch['f_s0'],
                                     self.come_from_demo: batch['demos'],
                                     self.action_memory: batch['actions']})
-            self.writer.add_summary(a_s)
-            self.policy_delay_iterate += 1
             self.sess.run(self.soft_replace_a)
+            self.writer.add_summary(a_s)
+
 
         if self.is_prioritiy:
             self.memory.update_priorities(batch['idxes'], td_errors= td_error )
 
         self.sess.run(self.soft_replace_c)
-
         self.writer.add_summary(c_s)
+        self.policy_delay_iterate += 1
 
     def store_transition(self,
                          obs0,
