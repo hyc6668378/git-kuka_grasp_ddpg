@@ -24,6 +24,7 @@ https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/gym/pybul
 - [x] `Prioritied Memory Replay `
 - [x] `n-step-ruturn`
 - [x] `DDPGfD`
+- [x] `TD3`
 - [ ] `her`
 - [ ] `curiosity`
 ......

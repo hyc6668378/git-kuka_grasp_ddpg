@@ -31,7 +31,8 @@ LAMBDA_BC = 100.0     # behavior clone weitht
 class DDPG(object):
     def __init__(self, memory_capacity, batch_size, prioritiy, noise_target_action=False,
                  alpha=0.2, use_n_step=False, n_step_return=5, is_training=True,
-                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False, experiment_name='none'):
+                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False, experiment_name='none',
+                 Q_value_range=(-250, 10)):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
@@ -39,6 +40,7 @@ class DDPG(object):
         self.LAMBDA_BC = LAMBDA_BC
         self.use_TD3 = use_TD3
         self.experiment_name = experiment_name
+        self.Q_value_range = Q_value_range # 限制q的范围,防止过估计.
 
         self.demo_percent = [] # demo 在 sample中所占比例
         if prioritiy:
@@ -92,7 +94,7 @@ class DDPG(object):
 
             # Target policy smoothing, by adding clipped noise to target actions
             if noise_target_action:
-                epsilon = tf.random_normal(tf.shape(self.action_), stddev=0.02)
+                epsilon = tf.random_normal(tf.shape(self.action_), stddev=0.007)
                 epsilon = tf.clip_by_value(epsilon, -0.01, 0.01)
                 a2 = self.action_ + epsilon
                 noised_action_ = tf.clip_by_value(a2, -self.act_limit, self.act_limit)
@@ -100,16 +102,23 @@ class DDPG(object):
                 noised_action_ = self.action_
 
         with tf.variable_scope('Critic'):
-            self.q_1 = self.build_critic(self.normalized_f_s0, self.action,
-                                         scope='eval_1', trainable=True, is_training=is_training)
+            # Q值都要被clip 防止过估计.
+            self.q_1 = tf.clip_by_value(
+                self.build_critic(self.normalized_f_s0, self.action,
+                                  scope='eval_1', trainable=True, is_training=is_training),
+                                        self.Q_value_range[0], self.Q_value_range[1])
+
             q_1_ = self.build_critic(self.normalized_f_s1, noised_action_,
-                                     scope='target_1', trainable=False, is_training=False)
+                                  scope='target_1', trainable=False, is_training=False)
 
             if self.use_TD3:
-                q_2 = self.build_critic(self.normalized_f_s0, self.action,
-                                        scope='eval_2', trainable=True, is_training=is_training)
+                q_2 = tf.clip_by_value(
+                    self.build_critic(self.normalized_f_s0, self.action,
+                                      scope='eval_2', trainable=True, is_training=is_training),
+                                        self.Q_value_range[0], self.Q_value_range[1])
+
                 q_2_ = self.build_critic(self.normalized_f_s1, noised_action_,
-                                   scope='target_2', trainable=False, is_training=False)
+                                      scope='target_2', trainable=False, is_training=False)
 
         # Collect networks parameters. It would make it more easily to manage them.
         self.ae_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='Actor/eval')
@@ -134,18 +143,22 @@ class DDPG(object):
                 min_q_ = tf.minimum(q_1_, q_2_)
             else:
                 min_q_ = q_1_
+
             self.q_target = self.R + (1. - self.terminals1) * GAMMA * min_q_
             if self.use_n_step:
                 self.n_step_target_q = self.R + (1. - self.terminals1) * tf.pow(GAMMA, self.n_step_steps) * min_q_
+                cliped_n_step_target_q = tf.clip_by_value(self.n_step_target_q, self.Q_value_range[0], self.Q_value_range[1])
 
-            self.td_error_1 = tf.abs(self.q_target - self.q_1)
+            cliped_q_target = tf.clip_by_value(self.q_target, self.Q_value_range[0], self.Q_value_range[1])
+
+            self.td_error_1 = tf.abs( cliped_q_target - self.q_1)
             if self.use_TD3:
-                self.td_error_2 = tf.abs(self.q_target - q_2)
+                self.td_error_2 = tf.abs( cliped_q_target - q_2)
 
             if self.use_n_step:
-                self.nstep_td_error_1 = tf.abs(self.n_step_target_q - self.q_1)
+                self.nstep_td_error_1 = tf.abs( cliped_n_step_target_q - self.q_1)
                 if self.use_TD3:
-                    self.nstep_td_error_2 = tf.abs(self.n_step_target_q - q_2)
+                    self.nstep_td_error_2 = tf.abs( cliped_n_step_target_q - q_2)
 
             L2_regular_1 = tf.contrib.layers.apply_regularization(tf.contrib.layers.l2_regularizer(0.001),
                                                                 weights_list=self.ce1_params)
@@ -161,12 +174,12 @@ class DDPG(object):
 
             if self.use_n_step:
                 n_step_td_losses_1 = tf.reduce_mean(
-                    tf.multiply(self.ISWeights, self.nstep_td_error_1)) * self.lambda_n_step
+                    tf.multiply(self.ISWeights, tf.square(self.nstep_td_error_1))) * self.lambda_n_step
                 c_loss_1 = one_step_losse_1 + n_step_td_losses_1 + L2_regular_1
 
                 if self.use_TD3:
                     n_step_td_losses_2 = tf.reduce_mean(
-                        tf.multiply(self.ISWeights, self.nstep_td_error_2)) * self.lambda_n_step
+                        tf.multiply(self.ISWeights, tf.square(self.nstep_td_error_2))) * self.lambda_n_step
                     c_loss_2 = one_step_losse_2 + n_step_td_losses_2 + L2_regular_2
             else:
                 c_loss_1 = one_step_losse_1 + L2_regular_1
@@ -178,23 +191,31 @@ class DDPG(object):
         # (只有demo的transition 且 demo的action 比 actor生成的action q_1(s,a)高的时候 才会有克隆误差)
         with tf.variable_scope('Actor_lose'):
             Is_worse_than_demo = self.q_1 < self.q_demo
-            action_diffs = tf.cast(Is_worse_than_demo, tf.float32) * tf.reduce_mean(
-                self.come_from_demo * tf.square(self.action - self.action_memory), 1, keep_dims=True)
-            L_BC = self.LAMBDA_BC * tf.reduce_mean(action_diffs)
+            Is_worse_than_demo = tf.cast(Is_worse_than_demo, tf.float32)
+            worse_than_demo = tf.cast(tf.reduce_sum( Is_worse_than_demo ), tf.int8)
+
+            # 算action误差 我用的是平方和, 也有人用均方误差 reduce_mean. 其实都可以.
+            # 我的action本来都是很小的数.
+            action_diffs = Is_worse_than_demo * tf.reduce_sum(
+                self.come_from_demo * tf.square(self.action - self.action_memory), 1, keepdims=True)
+
+            L_BC = self.LAMBDA_BC * tf.reduce_sum(action_diffs)
             a_loss = - tf.reduce_mean(self.q_1) + L_BC
 
         # Setting optimizer for Actor and Critic
-        with tf.variable_scope('Critic_Optimizer'):
-            self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params)
-            if self.use_TD3:
-                self.ctrain = tf.group(self.ctrain,
-                                tf.train.AdamOptimizer(LR_C).minimize(c_loss_2, var_list=self.ce2_params),
-                                name="ctrain")
-
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS) # batch-normal 参数更新
-        with tf.variable_scope('Actor_Optimizer'):
+        with tf.variable_scope('Critic_Optimizer'):
             with tf.control_dependencies(update_ops):
-                self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
+                if self.use_TD3:
+                    self.ctrain = tf.group(
+                        tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params),
+                        tf.train.AdamOptimizer(LR_C).minimize(c_loss_2, var_list=self.ce2_params),
+                                name="ctrain")
+                else:
+                    self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params)
+
+        with tf.variable_scope('Actor_Optimizer'):
+            self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
 
         self.sess.run(tf.global_variables_initializer())
 
@@ -212,7 +233,8 @@ class DDPG(object):
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
         self.writer = tf.summary.FileWriter("logs/" + self.experiment_name + "/", self.sess.graph)
         self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss, family='actor'),
-                                           tf.summary.scalar('L_BC',   L_BC, family='actor')])
+                                           tf.summary.scalar('L_BC',   L_BC, family='actor'),
+                                           tf.summary.scalar('worse_than_demo', worse_than_demo, family='actor')])
         if self.use_TD3:
             self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic'),
                                                tf.summary.scalar('c_loss_2', c_loss_2, family='critic')])
@@ -221,8 +243,7 @@ class DDPG(object):
 
     def pi(self, obs):
         obs = obs.astype(dtype=np.float32)
-        # 用 稳定的 actor target net 生成动作与环境交互.
-        return self.sess.run(self.action_, {self.observe_Input_: obs[np.newaxis, :]})[0]
+        return self.sess.run(self.action, {self.observe_Input: obs[np.newaxis, :]})[0]
 
     def Save(self):
         # 只存权重,不存计算图.
