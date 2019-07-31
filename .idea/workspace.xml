@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,24 +23,59 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="345">
-                <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ddpg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="562">
-              <caret line="121" selection-start-line="121" selection-end-line="121" />
+            <state relative-caret-position="676">
+              <caret line="331" lean-forward="true" selection-start-line="331" selection-end-line="331" />
               <folding>
                 <element signature="e#460#534#0" />
+                <element signature="e#1221#12801#0" />
+                <element signature="e#1622#1808#0" />
+                <element signature="e#3544#3801#0" />
+                <element signature="e#3862#3992#0" />
+                <element signature="e#4047#4836#0" />
+                <element signature="e#4513#4772#0" />
+                <element signature="e#4995#5962#0" />
+                <element signature="e#5512#5962#0" />
+                <element signature="e#6474#6667#0" />
+                <element signature="e#6728#7119#0" />
+                <element signature="e#6756#6824#0" />
+                <element signature="e#7304#9753#0" />
+                <element signature="e#7543#7753#0" />
+                <element signature="e#7982#8157#0" />
+                <element signature="e#8405#8595#0" />
+                <element signature="e#8783#8915#0" />
+                <element signature="e#9076#9579#0" />
+                <element signature="e#9351#9579#0" />
+                <element signature="e#9614#9753#0" />
+                <element signature="e#9120#9157#0" />
+                <element signature="e#9941#10520#0" />
+                <element signature="e#9883#9932#0" />
+                <element signature="e#10719#11191#0" />
+                <element signature="e#10752#11023#0" />
+                <element signature="e#11314#11452#0" />
+                <element signature="e#11930#12191#0" />
+                <element signature="e#12230#12428#0" />
+                <element signature="e#12264#12427#0" />
+                <element signature="e#11740#11907#0" />
+                <element signature="e#11937#12068#0" />
+                <element signature="e#12098#12186#0" />
+                <element signature="e#12251#12529#0" />
+                <element signature="e#12704#12919#0" />
+                <element signature="e#13191#13977#0" />
+                <element signature="e#13288#13628#0" />
+                <element signature="e#13695#13976#0" />
+                <element signature="e#14004#14279#0" />
+                <element signature="e#14056#14278#0" />
+                <element signature="e#14664#14964#0" />
+                <element signature="e#15606#16424#0" />
+                <element signature="e#15811#15981#0" />
+                <element signature="e#16008#16164#0" />
+                <element signature="e#16512#17776#0" />
+                <element signature="e#16794#17776#0" />
+                <element signature="e#17615#17637#0" />
+                <element signature="e#17858#18458#0" />
+                <element signature="e#18085#18458#0" />
               </folding>
             </state>
           </provider>
@@ -113,9 +146,9 @@
         <option value="$PROJECT_DIR$/run_bash2.sh" />
         <option value="$PROJECT_DIR$/run_bash3.sh" />
         <option value="$PROJECT_DIR$/run_bash4.sh" />
-        <option value="$PROJECT_DIR$/ddpg.py" />
         <option value="$PROJECT_DIR$/run_bash.sh" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/ddpg.py" />
       </list>
     </option>
   </component>
@@ -386,20 +419,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/framework/ops.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="6369" column="4" selection-start-line="6369" selection-start-column="4" selection-end-line="6369" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="3609" column="8" selection-start-line="3609" selection-start-column="4" selection-end-line="3609" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/priority_memory.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
@@ -454,16 +473,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="562">
-          <caret line="121" selection-start-line="121" selection-end-line="121" />
-          <folding>
-            <element signature="e#460#534#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/run_bash2.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
@@ -478,10 +487,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run_bash.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="13" column="11" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="11" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="345">
+            <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
@@ -492,13 +504,81 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="345">
-            <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
-          </first_editor>
-          <second_editor />
+    <entry file="file://$PROJECT_DIR$/run_bash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="13" column="11" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/ops/control_flow_ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="502">
+          <caret line="3609" column="8" selection-start-line="3609" selection-start-column="4" selection-end-line="3609" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.virtualenvs/py3_6/lib/python3.6/site-packages/tensorflow/python/framework/ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="5405" lean-forward="true" selection-start-line="5405" selection-end-line="5405" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="676">
+          <caret line="331" lean-forward="true" selection-start-line="331" selection-end-line="331" />
+          <folding>
+            <element signature="e#460#534#0" />
+            <element signature="e#1221#12801#0" />
+            <element signature="e#1622#1808#0" />
+            <element signature="e#3544#3801#0" />
+            <element signature="e#3862#3992#0" />
+            <element signature="e#4047#4836#0" />
+            <element signature="e#4513#4772#0" />
+            <element signature="e#4995#5962#0" />
+            <element signature="e#5512#5962#0" />
+            <element signature="e#6474#6667#0" />
+            <element signature="e#6728#7119#0" />
+            <element signature="e#6756#6824#0" />
+            <element signature="e#7304#9753#0" />
+            <element signature="e#7543#7753#0" />
+            <element signature="e#7982#8157#0" />
+            <element signature="e#8405#8595#0" />
+            <element signature="e#8783#8915#0" />
+            <element signature="e#9076#9579#0" />
+            <element signature="e#9351#9579#0" />
+            <element signature="e#9614#9753#0" />
+            <element signature="e#9120#9157#0" />
+            <element signature="e#9941#10520#0" />
+            <element signature="e#9883#9932#0" />
+            <element signature="e#10719#11191#0" />
+            <element signature="e#10752#11023#0" />
+            <element signature="e#11314#11452#0" />
+            <element signature="e#11930#12191#0" />
+            <element signature="e#12230#12428#0" />
+            <element signature="e#12264#12427#0" />
+            <element signature="e#11740#11907#0" />
+            <element signature="e#11937#12068#0" />
+            <element signature="e#12098#12186#0" />
+            <element signature="e#12251#12529#0" />
+            <element signature="e#12704#12919#0" />
+            <element signature="e#13191#13977#0" />
+            <element signature="e#13288#13628#0" />
+            <element signature="e#13695#13976#0" />
+            <element signature="e#14004#14279#0" />
+            <element signature="e#14056#14278#0" />
+            <element signature="e#14664#14964#0" />
+            <element signature="e#15606#16424#0" />
+            <element signature="e#15811#15981#0" />
+            <element signature="e#16008#16164#0" />
+            <element signature="e#16512#17776#0" />
+            <element signature="e#16794#17776#0" />
+            <element signature="e#17615#17637#0" />
+            <element signature="e#17858#18458#0" />
+            <element signature="e#18085#18458#0" />
+          </folding>
         </state>
       </provider>
     </entry>

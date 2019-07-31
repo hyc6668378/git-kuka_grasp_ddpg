@@ -205,17 +205,17 @@ class DDPG(object):
         # Setting optimizer for Actor and Critic
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS) # batch-normal 参数更新
         with tf.variable_scope('Critic_Optimizer'):
-            with tf.control_dependencies(update_ops):
-                if self.use_TD3:
-                    self.ctrain = tf.group(
-                        tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params),
-                        tf.train.AdamOptimizer(LR_C).minimize(c_loss_2, var_list=self.ce2_params),
-                                name="ctrain")
-                else:
-                    self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params)
+            if self.use_TD3:
+                self.ctrain = tf.group(
+                    tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params),
+                    tf.train.AdamOptimizer(LR_C).minimize(c_loss_2, var_list=self.ce2_params),
+                                           name='ctrain')
+            else:
+                self.ctrain = tf.train.AdamOptimizer(LR_C).minimize(c_loss_1, var_list=self.ce1_params)
 
         with tf.variable_scope('Actor_Optimizer'):
-            self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
+            with tf.control_dependencies(update_ops):
+                self.atrain = tf.train.AdamOptimizer(LR_A).minimize(a_loss, var_list=self.ae_params)
 
         self.sess.run(tf.global_variables_initializer())
 
