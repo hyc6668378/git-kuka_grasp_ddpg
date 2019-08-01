@@ -149,16 +149,15 @@ class KukaDiverseObjectEnv(Kuka):
         return np.array(self._observation)
 
     def get_full_state(self):
-        full_state = np.array([], dtype=np.float32)
+        full_state = []
 
         for uid in self._objectUids:
             pos, ori = p.getBasePositionAndOrientation(uid)
-            ori = p.getEulerFromQuaternion(ori)
-            full_state = np.hstack((full_state, np.array(pos), np.array(ori)))
-        # full_state += end_effector(pos,ori) + gripper(pos,ori)
-        full_state = np.hstack((full_state, self._kuka.getObservation()))
-        # full_state.shape = (24,)
+            full_state.extend(pos)
+        full_state.extend( self._kuka.getObservation())
+        full_state = np.array(full_state).flatten()
 
+        # full_state.shape = (15,)
         return full_state
 
     def demo_policy(self):

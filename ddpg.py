@@ -2,8 +2,6 @@
 
 import tensorflow as tf
 import numpy as np
-from memory import Memory
-from priority_memory import PrioritizedMemory
 from mpi_running_mean_std import RunningMeanStd        # update the mean and std dynamically.
 import tensorflow.contrib as tc
 from functools import partial
@@ -32,7 +30,7 @@ class DDPG(object):
     def __init__(self, memory_capacity, batch_size, prioritiy, noise_target_action=False,
                  alpha=0.2, use_n_step=False, n_step_return=5, is_training=True,
                  LAMBDA_BC = 100, policy_delay=1, use_TD3=False, experiment_name='none',
-                 Q_value_range=(-250, 10)):
+                 Q_value_range=(-250, 5)):
         self.batch_size = batch_size
         self.is_prioritiy = prioritiy
         self.n_step_return = n_step_return
@@ -44,8 +42,10 @@ class DDPG(object):
 
         self.demo_percent = [] # demo 在 sample中所占比例
         if prioritiy:
+            from priority_memory import PrioritizedMemory
             self.memory = PrioritizedMemory(capacity=memory_capacity, alpha=alpha)
         else:
+            from memory import Memory
             self.memory = Memory(limit=memory_capacity, action_shape=(4,),
                                  observation_shape=(224, 224, 3),
                                  full_state_shape=(24, ))
