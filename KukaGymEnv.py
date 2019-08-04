@@ -163,9 +163,9 @@ class KukaDiverseObjectEnv(Kuka):
     def demo_policy(self):
         fs = self.get_full_state()
         # 随便选一个物体
-        fu_state = {'gripper.x': fs[18],
-                    'gripper.y': fs[19],
-                    'gripper.z': fs[20],
+        fu_state = {'gripper.x': fs[9],
+                    'gripper.y': fs[10],
+                    'gripper.z': fs[11],
                     'object1.x': fs[0],
                     'object1.y': fs[1],
                     'object1.z': fs[2]}
@@ -347,7 +347,7 @@ class KukaDiverseObjectEnv(Kuka):
         elif (end_effector_pos[1] < -0.25) or (end_effector_pos[1] > 0.25):
             reward = -1
             self.out_of_range = 1
-        elif (end_effector_pos[2] < -0.) or (end_effector_pos[2] > 0.5 + 0.5):
+        elif (end_effector_pos[2] < -0.) or (end_effector_pos[2] > 0.5 + 0.3):
             reward = -1
             self.out_of_range = 1
 

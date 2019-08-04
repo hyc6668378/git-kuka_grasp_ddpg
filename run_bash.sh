@@ -1,14 +1,14 @@
 #!/bin/bash
 python run.py -p \
- --memory_size 10000 \
+ --memory_size 3000 \
+ --isRENDER \
  --batch_size 64 \
  --alpha 0.2 \
  --use_n_step \
- --experiment_name demo_TD3_BC_5 \
+ --experiment_name low_dim_obs \
  --PreTrain_STEPS 3000 \
- --Demo_CAPACITY 2000 \
+ --Demo_CAPACITY 1000 \
  --max_episodes 15000 \
  --use_TD3 \
- --noise_target_action \
  --LAMBDA_BC 5 &&
 echo "done"

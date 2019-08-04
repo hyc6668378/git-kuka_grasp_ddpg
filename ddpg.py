@@ -48,7 +48,8 @@ class DDPG(object):
             from memory import Memory
             self.memory = Memory(limit=memory_capacity, action_shape=(4,),
                                  observation_shape=(224, 224, 3),
-                                 full_state_shape=(24, ))
+                                 full_state_shape=(15, ))
+
         self.pointer = 0                        # memory 计数器　
         self.sess = tf.InteractiveSession()     # 创建一个默认会话
         self.lambda_1_step = 0.5                 # 1_step_return_loss的权重
@@ -61,10 +62,10 @@ class DDPG(object):
         self.policy_delay = policy_delay
 
         # 定义 placeholders
-        self.observe_Input = tf.placeholder(tf.float32, [None, 128, 128, 3], name='observe_Input')
-        self.observe_Input_ = tf.placeholder(tf.float32, [None, 128, 128, 3], name='observe_Input_')
-        self.f_s = tf.placeholder(tf.float32, [None, 24], name='full_state_Input')
-        self.f_s_ = tf.placeholder(tf.float32, [None, 24], name='fill_state_Input_')
+        self.observe_Input = tf.placeholder(tf.float32, [None, 15], name='observe_Input')
+        self.observe_Input_ = tf.placeholder(tf.float32, [None, 15], name='observe_Input_')
+        self.f_s = tf.placeholder(tf.float32, [None, 15], name='full_state_Input')
+        self.f_s_ = tf.placeholder(tf.float32, [None, 15], name='fill_state_Input_')
         self.R = tf.placeholder(tf.float32, [None, 1], 'r')
         self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
         self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
@@ -74,9 +75,9 @@ class DDPG(object):
         self.action_memory = tf.placeholder(tf.float32, [None, 4], name='actions_from_memory')
 
         with tf.variable_scope('obs_rms'):
-            self.obs_rms = RunningMeanStd(shape=(128, 128, 3))
+            self.obs_rms = RunningMeanStd(shape=(15,))
         with tf.variable_scope('state_rms'):
-            self.state_rms = RunningMeanStd(shape=(24,))
+            self.state_rms = RunningMeanStd(shape=(15,))
         with tf.name_scope('obs_preprocess'):
             self.normalized_observe_Input = tf.clip_by_value(
                 normalize(self.observe_Input, self.obs_rms), -10., 10.)
@@ -235,11 +236,17 @@ class DDPG(object):
         self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss, family='actor'),
                                            tf.summary.scalar('L_BC',   L_BC, family='actor'),
                                            tf.summary.scalar('worse_than_demo', worse_than_demo, family='actor')])
+
         if self.use_TD3:
             self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic'),
                                                tf.summary.scalar('c_loss_2', c_loss_2, family='critic')])
         else:
             self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic')])
+
+
+        self.episode_result = tf.placeholder(tf.int8, name='episode_result')
+        self.episode_summary = tf.summary.merge([
+            tf.summary.scalar('Episode_Result( success or not )', self.episode_result, family='Result')])
 
     def pi(self, obs):
         obs = obs.astype(dtype=np.float32)
@@ -251,6 +258,11 @@ class DDPG(object):
 
     def load(self):
         self.saver.restore(self.sess, save_path="model/" + self.experiment_name + "/model.ckpt")
+
+    def save_episoed_result(self, result, episoed):
+        s = self.sess.run(self.episode_summary,
+                      feed_dict={ self.episode_result: result })
+        self.writer.add_summary(s, episoed)
 
     def learn(self):
         if self.is_prioritiy:
@@ -267,7 +279,7 @@ class DDPG(object):
         one_step_target_q = self.sess.run(
             self.q_target,
             feed_dict={
-                self.observe_Input_: batch['obs1'],
+                self.observe_Input_: batch['f_s1'], # low dim input
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
                 self.f_s_: batch['f_s1']
@@ -284,7 +296,7 @@ class DDPG(object):
                 feed_dict={self.terminals1: n_step_batch["terminals1"],
                            self.n_step_steps: n_step_batch["step_reached"],
                            self.R:  n_step_batch['rewards'],
-                           self.observe_Input_: n_step_batch['obs1'],
+                           self.observe_Input_: n_step_batch['f_s1'],
                            self.f_s_: n_step_batch['f_s1']
                            })
 
@@ -314,7 +326,7 @@ class DDPG(object):
         # actor update
         if self.policy_delay_iterate % self.policy_delay == 0:
             _, a_s, = self.sess.run([self.atrain, self.a_summary],
-                                   {self.observe_Input: batch['obs0'],
+                                   {self.observe_Input: batch['f_s0'],
                                     self.q_demo: q_demo,
                                     self.f_s: batch['f_s0'],
                                     self.come_from_demo: batch['demos'],
@@ -351,8 +363,8 @@ class DDPG(object):
                             obs1=obs1, f_s1=full_state1, terminal1=terminal1)
 
         # 增量式的更新observe的均值标准差
-        self.obs_rms.update(np.array([obs0]))
-        self.obs_rms.update(np.array([obs1]))
+        # self.obs_rms.update(np.array([obs0]))
+        # self.obs_rms.update(np.array([obs1]))
         self.state_rms.update(np.array([full_state0]))
         self.state_rms.update(np.array([full_state1]))
 
@@ -365,15 +377,15 @@ class DDPG(object):
         relu = partial(tf.nn.relu)
         with tf.variable_scope(scope):
             # conv -> BN -> relu
-            net = relu(bn_a(conv2_a( observe_input, 32 )))
-            net = relu(bn_a(conv2_a( net, 32 )))
-            net = relu(bn_a(conv2_a( net, 64 )))
-            net = relu(bn_a(conv2_a( net, 64 )))
-            net = relu(bn_a(conv2_a( net, 128 )))
-            net = relu(bn_a(conv2_a( net, 128 )))
-
-            net = tf.layers.flatten(net)
-
+            # net = relu(bn_a(conv2_a( observe_input, 32 )))
+            # net = relu(bn_a(conv2_a( net, 32 )))
+            # net = relu(bn_a(conv2_a( net, 64 )))
+            # net = relu(bn_a(conv2_a( net, 64 )))
+            # net = relu(bn_a(conv2_a( net, 128 )))
+            # net = relu(bn_a(conv2_a( net, 128 )))
+            #
+            # net = tf.layers.flatten(net)
+            net = observe_input
             net = relu(bn_a(fc_a( net, 128 )))
             net = relu(bn_a(fc_a( net, 128 )))
             action_output = fc_a( net, 4, activation=tf.nn.tanh,

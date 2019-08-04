@@ -25,7 +25,7 @@ def common_arg_parser():
     parser.add_argument("--turn_beta",  action="store_true", help="turn the beta from 0.6 to 1.0")
     parser.add_argument("--use_n_step", help="use n_step_loss", action="store_true")
     parser.add_argument('--n_step_return', type=int, default=5, help="n step return. default = 5")
-    parser.add_argument('--Demo_CAPACITY', type=int, default=2000, help="The number of demo transitions. default = 2000")
+    parser.add_argument('--Demo_CAPACITY', type=int, default=3000, help="The number of demo transitions. default = 2000")
     parser.add_argument('--PreTrain_STEPS', type=int, default=2000, help="The steps for PreTrain. default = 2000")
     parser.add_argument('--max_episodes', type=int, default=8000, help="The Max episodes. default = 8000")
     parser.add_argument("--noise_target_action", help="noise target_action for Target policy smoothing", action="store_true")
@@ -52,6 +52,19 @@ env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            numObjects=3, dv=1.0)
 
 Noise = OUNoise(size=4, mu=0, theta=0.05, sigma=0.25)
+
+def mkdir(experiment_name):
+    folder = os.path.exists("logs/"+experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+            os.makedirs("logs/"+experiment_name)
+
+    folder = os.path.exists("result/" + experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs("result/" + experiment_name)
+
+    folder = os.path.exists("model/" + experiment_name)
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs("model/" + experiment_name)
 
 def set_global_seeds(myseed):
 
@@ -110,15 +123,14 @@ def preTrain(PreTrain_STEPS):
     print(" PreTraining completed.")
 
 def train(max_episodes):
-    succ_list = np.array([])  # the succession rate list
-    steps_list = np.array([])  # step counter
-    learn_graspsuccess = 0.0
-    for i in tqdm(range(max_episodes)):
+
+    learn_grasp_success = 0.0
+    for episoed in tqdm(range(max_episodes)):
         obs0, done = env.reset(), False
         f_s0 = env.get_full_state()
         for j in range(args.max_ep_steps):
 
-            action = agent.pi( obs0 )
+            action = agent.pi( f_s0 ) # low dim obs
             action = Noise_Action( action )
 
             obs1, reward, done, info = env.step( action )
@@ -131,11 +143,10 @@ def train(max_episodes):
                                    full_state1=f_s1,
                                    obs1=obs1,
                                    terminal1=done)
-            obs0 = obs1
-            f_s0 = f_s1
+            obs0, f_s0 = obs1, f_s1
 
             if info['grasp_success'] == 1:
-                learn_graspsuccess += 1
+                learn_grasp_success += 1
 
             if agent.pointer > args.memory_size:
                 for _ in range(args.inter_learn_steps):
@@ -143,32 +154,15 @@ def train(max_episodes):
             if done:
                 break
 
+        # 将一个episode的结果打印到 tensorboard
+        agent.save_episoed_result(done, episoed)
+
         # Noise decay
         Noise.theta = np.linspace(0.05, 0.0, max_episodes)[i]
         Noise.sigma = np.linspace(0.25, 0.0, max_episodes)[i]
         if args.turn_beta:
             agent.beta = np.linspace(0.6, 1.0, max_episodes)[i]
 
-        if i % 50 == 0:
-            succ_list = np.append(succ_list, learn_graspsuccess)
-            steps_list = np.append(steps_list,i)
-            print("\nepisode: {} | success rate: {:.2f}%".format(i, learn_graspsuccess*2))
-            learn_graspsuccess = 0.
-            save_all(succ_list, steps_list, agent.demo_percent)
-    return succ_list, steps_list
-
-def mkdir(experiment_name):
-    folder = os.path.exists("logs/"+experiment_name)
-    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
-            os.makedirs("logs/"+experiment_name)
-
-    folder = os.path.exists("result/" + experiment_name)
-    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
-        os.makedirs("result/" + experiment_name)
-
-    folder = os.path.exists("model/" + experiment_name)
-    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
-        os.makedirs("model/" + experiment_name)
 
 def main():
     t1 = time.time()
@@ -184,10 +178,10 @@ def main():
 
     preTrain( args.PreTrain_STEPS )
 
-    succ_list, steps_list = train( args.max_episodes )
+    train( args.max_episodes )
 
-    save_all(succ_list, steps_list, agent.demo_percent)
-    plot( succ_list, steps_list )
+    save_all(agent.demo_percent)
+
     print("total Running time:{:.2f}(h) ".format((time.time() - t1)/3600.))
 
 if __name__ == '__main__':
