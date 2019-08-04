@@ -1,8 +1,10 @@
 # coding=utf-8
 
 from KukaGymEnv import KukaDiverseObjectEnv
-import numpy as np
 import argparse
+import numpy as np
+from multiprocessing import Pool
+import os
 
 def common_arg_parser():
     parser = argparse.ArgumentParser()
@@ -29,9 +31,9 @@ env = KukaDiverseObjectEnv(renders=args.isRENDER,
                            maxSteps=args.max_ep_steps,
                            removeHeightHack=True,
                            numObjects=3, dv=1.0)
-def main():
-    print("\nDemo_Collection.....")
-    i = 0
+def collect_worker(worker_index):
+    print (str(worker_index)+" start!")
+    i = worker_index * 300
     while 1:
         obs0, done = env.reset(), False
         f_s0 = env.get_full_state()
@@ -56,10 +58,17 @@ def main():
             i = i + 1
             if done:
                 break
-            if i % 500 == 0:
-                print("%d demos has been collected " % (i))
-        if i > 2000:
-            break
+
+            if i >= (worker_index+1) * 300 -1 :
+                return
 
 if __name__ == '__main__':
-    main()
+    # 开12个进程 一起收集demo
+    print('Parent process %s.' % os.getpid())
+    p = Pool(12)
+
+    for k in range(12):
+        p.apply_async(collect_worker, args=(k,))
+    p.close()
+    p.join()
+    print('All subprocesses done.')
