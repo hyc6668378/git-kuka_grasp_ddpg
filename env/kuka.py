@@ -46,8 +46,13 @@ class Kuka:
         #  print(p.getJointInfo(self.kukaUid,i))
         p.resetBasePositionAndOrientation(self.kukaUid, [-0.100000, 0.000000, 0.070000],
                                           [0.000000, 0.000000, 0.000000, 1.000000])
-        self.jointPositions = [0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684, -0.006539, 0.000048,
-                               -0.299912, 0.000000, -0.000043, 0.299960, 0.000000, -0.000200]
+        # self.jointPositions = [0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684, -0.006539, 0.000048,
+        #                        -0.299912, 0.000000, -0.000043, 0.299960, 0.000000, -0.000200]
+        self.jointPositions = [0.0052822753, 0.63178448, -0.009966143,
+                               -1.7201607, 0.008282072, 0.7897110, -0.00860167,
+                               0.000048, -0.299912, 0.000000, -0.000043, 0.299960, 0.000000, -0.000200
+                               ]
+
         self.numJoints = p.getNumJoints(self.kukaUid)
         for jointIndex in range(self.numJoints):
             p.resetJointState(self.kukaUid, jointIndex, self.jointPositions[jointIndex])
@@ -101,7 +106,6 @@ class Kuka:
         # print ("self.numJoints")
         # print (self.numJoints)
         if (self.useInverseKinematics):
-            pos = pos
             self.current_endEffectorAngle = da
             self.current_endEffectorAngle = np.clip(self.current_endEffectorAngle, a_min=np.radians(-90),
                                                     a_max=np.radians(90))  # constrain in [-pi/2, pi/2]
@@ -142,7 +146,6 @@ class Kuka:
 
             p.setJointMotorControl2(self.kukaUid, 10, p.POSITION_CONTROL, targetPosition=0, force=self.fingerTipForce)
             p.setJointMotorControl2(self.kukaUid, 13, p.POSITION_CONTROL, targetPosition=0, force=self.fingerTipForce)
-
 
         else:
             for action in range(len(motorCommands)):

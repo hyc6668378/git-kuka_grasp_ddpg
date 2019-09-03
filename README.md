@@ -6,18 +6,19 @@ https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/gym/pybul
 
 环境部分都是从这个`benchmark`摘出来的.
 对环境做了修改:
-* 删除了原始环境在对动作空间的伸缩. 原来动作空间(-1,1)*4 . 又在在kuka层进行了伸缩和剪切.
 
 * 增加合法活动区域. 超出活动区域将会终止episode,且给一个负反馈.
 
+* 修改reward function.
+
 * 修改抓取动作的触发高度
 
-* 从模拟器提取 full-state 信息. ( 物体位姿 , 爪子位姿 ) 作为critic 的state输入. 促进训练.
+* 将低维full-state信息(物体位姿 , 爪子位姿)作为critic的state.
 
-该环境主要毛病是:
-* 暂时只使用单核. 效率很低.
+框架扩充：
+* 支持mpi. (ok, 我承认，其实是照着baselines写的...)
 
-* 算法还没有调试到最好.(组合方法,超参数)
+(mpi对于交互开销不大的环境，并不会加快训练，反而会因为网络的同步更新，拖慢训练速度。)
 
 ## 算法选择
 算法部分可以选择`标准DDPG` 和如下`improvements`之一

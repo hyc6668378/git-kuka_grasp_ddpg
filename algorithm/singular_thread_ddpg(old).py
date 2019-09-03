@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 import numpy as np
-from mpi_running_mean_std import RunningMeanStd        # update the mean and std dynamically.
+from stable_baselines.common.mpi_running_mean_std import RunningMeanStd
 import tensorflow.contrib as tc
 from functools import partial
 

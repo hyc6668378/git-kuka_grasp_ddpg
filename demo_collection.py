@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from KukaGymEnv import KukaDiverseObjectEnv
+from env.KukaGymEnv import KukaDiverseObjectEnv
 import argparse
 import numpy as np
 from multiprocessing import Pool

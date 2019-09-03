@@ -1,12 +1,12 @@
 # coding=utf-8
 
-from kuka import Kuka
+from env.kuka import Kuka
 import random
 import os
 from gym import spaces
 import time
 import pybullet as p
-import kuka
+from env import kuka
 import numpy as np
 import pybullet_data
 import glob
@@ -84,6 +84,7 @@ class KukaDiverseObjectEnv(Kuka):
         self._height = height
         self._numObjects = numObjects
         self._isTest = isTest
+        self.observation_space = spaces.Box(low=0, high=255, shape=(self._width, self._height, 3), dtype=np.uint32)
 
         if self._renders:
             self.cid = p.connect(p.SHARED_MEMORY)
@@ -110,11 +111,15 @@ class KukaDiverseObjectEnv(Kuka):
         """Environment reset called at the beginning of an episode.
         """
         # Set the camera settings.
-        look = [0.23, 0.2, 0.54]
+        look = [0.6, 0.4, 0.34]
+        # look = [0.23, 0.2, 0.54]
         distance = 1.
-        pitch = -56 + self._cameraRandom * np.random.uniform(-3, 3)
-        yaw = 245 + self._cameraRandom * np.random.uniform(-3, 3)
-        roll = 0
+        # pitch = -56 + self._cameraRandom * np.random.uniform(-3, 3)
+        pitch = -50
+        yaw = -185
+        roll = 10
+        # yaw = 245 + self._cameraRandom * np.random.uniform(-3, 3)
+        # roll = 0
         self._view_matrix = p.computeViewMatrixFromYawPitchRoll(
             look, distance, yaw, pitch, roll, 2)
         fov = 20. + self._cameraRandom * np.random.uniform(-2, 2)
@@ -250,8 +255,9 @@ class KukaDiverseObjectEnv(Kuka):
                 dy = [0, 0, 0, -dv, dv, 0, 0][action]
                 dz = -dv
                 da = [0, 0, 0, 0, 0, -0.25, 0.25][action]
-
         else:
+            act_scale = np.array([0.05, 0.05, 0.05, np.radians(90)])
+            action = action * act_scale
             dx = dv * action[0]
             dy = dv * action[1]
             if self._removeHeightHack:
@@ -311,8 +317,9 @@ class KukaDiverseObjectEnv(Kuka):
                     finger_angle = 0
             # up the gripple a little and grasp
             end_effector_pos = np.array(end_effector_pos)
-            for _ in range(500):
+            for _ in range(400):
                 end_effector_pos[2] = end_effector_pos[2] + 0.001
+
                 self._kuka.applyAction(end_effector_pos, da=self.current_a, fingerAngle=finger_angle)
                 p.stepSimulation()
                 if self._renders:
@@ -320,11 +327,11 @@ class KukaDiverseObjectEnv(Kuka):
                 finger_angle -= 0.3 / 100.
                 if finger_angle < 0:
                     finger_angle = 0
+
             self._attempted_grasp = True
         observation = self._get_observation()
         done = self._termination()
         reward = self._reward()
-
         debug = {
             'grasp_success': self._graspSuccess
         }
@@ -333,36 +340,49 @@ class KukaDiverseObjectEnv(Kuka):
     def _reward(self):
         """
         gripper out of range   -1
-        grasp success          +5
-        other                   0
+        Prone to object bonus  - dis_to_nearest_object
+        grasp success          +2
+        attempted_grasp_but_not_success 0
         """
         state = p.getLinkState(self._kuka.kukaUid,
                                self._kuka.kukaEndEffectorIndex)
-        reward = 0
-
         end_effector_pos = state[0]
+
+        # out_of_range
+        out_of_range = False
         if (end_effector_pos[0] < 0.537 - 0.25) or (end_effector_pos[0] > 0.537 + 0.25):
-            reward = -1
-            self.out_of_range = 1
+            out_of_range = True
         elif (end_effector_pos[1] < -0.25) or (end_effector_pos[1] > 0.25):
-            reward = -1
-            self.out_of_range = 1
+            out_of_range = True
         elif (end_effector_pos[2] < -0.) or (end_effector_pos[2] > 0.5 + 0.3):
-            reward = -1
-            self.out_of_range = 1
+            out_of_range = True
+        if out_of_range:
+            return -1
 
         self._graspSuccess = 0
+        dis_list = []
         for uid in self._objectUids:
             pos, _ = p.getBasePositionAndOrientation(uid)
+            dx = pos[0] - end_effector_pos[0]
+            dy = pos[1] - end_effector_pos[1]
+            dz = pos[2] - end_effector_pos[2]
+            dis_ = np.sqrt( dx **2 + dy**2 + dz**2)
+            dis_list.append( [uid, dis_]) #算一个距离 append一个距离
 
-            # dis_ = np.sqrt((pos[0] - end_effector_pos[0])**2 + (pos[1]- end_effector_pos[1])**2 + (pos[2] - end_effector_pos[2])**2)
-            # end_uid_dis = np.append( end_uid_dis, dis_ ) #算一个距离 append一个距离
-
-            # If any block is above height, provide reward.
-            if pos[2] > 0.2:
+            # If any block is above height, return reward.
+            if pos[2] > 0.05:
                 self._graspSuccess += 1
-                reward = 5
-                break
+                reward = 2
+                return reward
+        dis_list = np.array(dis_list)
+        min_dis_from_EndEffector_to_object = np.min(dis_list[:, 1])
+        prone_to_object_bonus = 0.2 - min_dis_from_EndEffector_to_object
+
+        if self._attempted_grasp:
+            reward = 0
+        else:
+            reward = prone_to_object_bonus
+
         return reward
 
     def _termination(self):

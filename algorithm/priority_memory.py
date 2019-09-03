@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import numpy as np
-from segment_tree import SumSegmentTree, MinSegmentTree
+from stable_baselines.common.segment_tree import SumSegmentTree, MinSegmentTree
 
 # 加入demo 时候也要注意 数据类型
 def array_min2d(x):
