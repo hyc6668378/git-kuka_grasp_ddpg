@@ -2,28 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="增加 DDPGfD">
-      <change afterPath="$PROJECT_DIR$/algorithm/My_toolkit.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/algorithm/ddpg.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/env/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/git-kuka_grasp_ddpg.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/git-kuka_grasp_ddpg.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/KukaGymEnv.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OUNoise.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/OUNoise.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/singular_thread_ddpg(old).py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo_collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo_collection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kuka.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/kuka.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/memory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mpi_adam.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mpi_running_mean_std.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/priority_memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/priority_memory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/KukaGymEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/segment_tree.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tf_util.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

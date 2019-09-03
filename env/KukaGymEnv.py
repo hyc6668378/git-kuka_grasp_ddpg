@@ -204,7 +204,7 @@ class KukaDiverseObjectEnv(Kuka):
             angle = np.pi / 2 + self._blockRandom * np.pi * random.random()
             orn = p.getQuaternionFromEuler([0, 0, angle])
             urdf_path = os.path.join(self._urdfRoot, urdf_name)
-            uid = p.loadURDF(urdf_path, [xpos, ypos, .15],
+            uid = p.loadURDF(urdf_path, [xpos, ypos, .05],
                              [orn[0], orn[1], orn[2], orn[3]])
 
             objectUids.append(uid)

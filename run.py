@@ -23,7 +23,7 @@ def common_arg_parser():
     parser.add_argument('--max_ep_steps',    type=int, default=20, help="一个episode最大长度. default = 50")
     parser.add_argument('--seed',    type=int, default=0, help="random seed. default = 0")
     parser.add_argument('--isRENDER',  action="store_true", help="Is render GUI in evaluation?")
-    parser.add_argument('--total_timesteps', type=int, default=int(1e+6), help="The timestep of whole training. default = 1e+6")
+    parser.add_argument('--max_epochs', type=int, default=int(1e+4), help="The max_epochs of whole training. default = 10000")
     parser.add_argument("--noise_target_action", help="noise target_action for Target policy smoothing", action="store_true")
     parser.add_argument("--nb_rollout_steps", type=int, default=3, help="The timestep of whole training. default = 5")
     parser.add_argument("--evaluation", help="Evaluate model", action="store_true")
@@ -100,7 +100,7 @@ def preTrain(agent, PreTrain_STEPS):
 
     print(" PreTraining completed.")
 
-def train(agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEPS, memory_size, turn_beta,
+def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, memory_size, turn_beta,
           nb_rollout_steps=5, inter_learn_steps=5, **kwargs):
 
     # OU noise
@@ -124,13 +124,9 @@ def train(agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEP
         else:
             total_steps = PreTrain_STEPS
 
-        for epoch in range(int(1e+10)):
+        for epoch in range(int(max_epochs)):
             # Perform rollouts.
             for i in range(nb_rollout_steps):
-
-                # exit
-                if total_steps >= int(total_timesteps):
-                    return agent
 
                 # Predict next action.
                 action = agent.pi(obs)
@@ -153,12 +149,6 @@ def train(agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEP
                 obs = new_obs
                 full_state = new_full_state
 
-                # Noise decay
-                Noise.theta = np.linspace(0.05, 0.0, total_timesteps)[i]
-                Noise.sigma = np.linspace(0.25, 0.0, total_timesteps)[i]
-                if turn_beta:
-                    agent.beta = np.linspace(0.6, 1.0, total_timesteps)[i]
-
                 if done:
                     # Episode done.
                     episodes += 1
@@ -172,6 +162,12 @@ def train(agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEP
             if agent.pointer >= memory_size:
                 for t_train in range(inter_learn_steps):
                     agent.learn(total_steps)
+
+            # Noise decay
+            Noise.theta = np.linspace(0.05, 0.0, max_epochs)[epoch]
+            Noise.sigma = np.linspace(0.25, 0.0, max_epochs)[epoch]
+            if turn_beta:
+                agent.beta = np.linspace(0.6, 1.0, max_epochs)[epoch]
 
             # Evaluate. The frequency of evaluation is limited as below
             if eval_env is not None and epoch % 10 == 0:
@@ -188,8 +184,8 @@ def train(agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEP
                 agent.save_eval_episoed_result(eval_episode_cumulate_reward, eval_episode_length,
                                                eval_info['grasp_success'], eval_episodes)
 
-
-def main(experiment_name, seed, total_timesteps, evaluation, isRENDER, max_ep_steps,
+        return agent
+def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
          use_DDPGfD, Demo_CAPACITY, PreTrain_STEPS,
          **kwargs):
 
@@ -225,7 +221,7 @@ def main(experiment_name, seed, total_timesteps, evaluation, isRENDER, max_ep_st
         demo_collect( agent, Demo_CAPACITY )
         preTrain( agent, PreTrain_STEPS )
 
-    agent_trained = train( agent, env, eval_env, total_timesteps, rank, use_DDPGfD, PreTrain_STEPS, **kwargs )
+    agent_trained = train( agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, **kwargs )
     if rank == 0:
         agent_trained.Save()
 
