@@ -151,7 +151,7 @@ class KukaDiverseObjectEnv(Kuka):
             self._numObjects, self._isTest)
         self._objectUids = self._randomly_place_objects(urdfList)
         self._observation = self._get_observation()
-        return np.array(self._observation)
+        return  self._observation
 
     def get_full_state(self):
         full_state = []

@@ -341,7 +341,7 @@ class DDPG(object):
         one_step_target_q = self.sess.run(
             self.q_target,
             feed_dict={
-                self.observe_Input_: batch['f_s1'], # low dim input
+                self.observe_Input_: batch['obs1'], # low dim input
                 self.R: batch['rewards'],
                 self.terminals1: batch['terminals1'],
                 self.f_s_: batch['f_s1']
@@ -358,7 +358,7 @@ class DDPG(object):
                 feed_dict={self.terminals1: n_step_batch["terminals1"],
                            self.n_step_steps: n_step_batch["step_reached"],
                            self.R:  n_step_batch['rewards'],
-                           self.observe_Input_: n_step_batch['f_s1'],
+                           self.observe_Input_: n_step_batch['obs1'],
                            self.f_s_: n_step_batch['f_s1']
                            })
             res = self.sess.run(
@@ -393,7 +393,7 @@ class DDPG(object):
         # actor update
         if self.policy_delay_iterate % self.policy_delay == 0:
             actor_grads, a_s, = self.sess.run([self.actor_grads, self.a_summary],
-                                   {self.observe_Input: batch['f_s0'],
+                                   {self.observe_Input: batch['obs0'],
                                     self.q_demo: q_demo,
                                     self.f_s: batch['f_s0'],
                                     self.come_from_demo: batch['demos'],
