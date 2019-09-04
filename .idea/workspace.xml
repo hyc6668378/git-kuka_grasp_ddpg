@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="增加 DDPGfD">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/algorithm/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/KukaGymEnv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithm/memory.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/memory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

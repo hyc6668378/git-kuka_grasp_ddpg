@@ -30,7 +30,7 @@ def common_arg_parser():
 
     # priority memory replay
     parser.add_argument("-p", "--priority", action="store_true", help="priority memory replay")
-    parser.add_argument('--alpha', type=float, default=0.2, help="priority degree")
+    parser.add_argument('--alpha', type=float, default=0.6, help="priority degree")
     parser.add_argument("--turn_beta",  action="store_true", help="turn the beta from 0.6 to 1.0")
 
     # n_step_return
@@ -50,7 +50,6 @@ def common_arg_parser():
     args = parser.parse_args()
     dict_args = vars(args)
     return dict_args
-
 
 def set_process_seeds(myseed):
 
@@ -100,7 +99,7 @@ def preTrain(agent, PreTrain_STEPS):
 
     print(" PreTraining completed.")
 
-def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, memory_size, turn_beta,
+def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
           nb_rollout_steps=5, inter_learn_steps=5, **kwargs):
 
     # OU noise
@@ -118,11 +117,7 @@ def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, me
         episode_cumulate_reward_history = []
         episode_cumulate_reward = 0
         eval_episodes = 0
-
-        if use_DDPGfD:
-            total_steps = 0
-        else:
-            total_steps = PreTrain_STEPS
+        train_step = 0
 
         for epoch in range(int(max_epochs)):
             # Perform rollouts.
@@ -137,7 +132,6 @@ def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, me
 
                 new_full_state = env.get_full_state()
 
-                total_steps += 1
                 agent.num_timesteps += 1
 
                 episode_cumulate_reward = 0.99 * episode_cumulate_reward + reward
@@ -161,7 +155,8 @@ def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, me
             # Train.
             if agent.pointer >= memory_size:
                 for t_train in range(inter_learn_steps):
-                    agent.learn(total_steps)
+                    agent.learn(train_step)
+                    train_step += 1
 
             # Noise decay
             Noise.theta = np.linspace(0.05, 0.0, max_epochs)[epoch]
@@ -185,6 +180,7 @@ def train(agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, me
                                                eval_info['grasp_success'], eval_episodes)
 
         return agent
+
 def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
          use_DDPGfD, Demo_CAPACITY, PreTrain_STEPS,
          **kwargs):
@@ -221,7 +217,7 @@ def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
         demo_collect( agent, Demo_CAPACITY )
         preTrain( agent, PreTrain_STEPS )
 
-    agent_trained = train( agent, env, eval_env, max_epochs, rank, use_DDPGfD, PreTrain_STEPS, **kwargs )
+    agent_trained = train( agent, env, eval_env, max_epochs, rank, **kwargs )
     if rank == 0:
         agent_trained.Save()
 
