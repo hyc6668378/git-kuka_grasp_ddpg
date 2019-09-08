@@ -109,7 +109,7 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
     print('Process_%d has been rollout!'%(rank))
     with agent.sess.as_default(), agent.graph.as_default():
         obs = env.reset()
-        full_state = env.get_full_state()
+        full_state = env._low_dim_full_state()
 
         # book everything
         episode_length = 0
@@ -130,7 +130,7 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
 
                 new_obs, reward, done, info = env.step(action)
 
-                new_full_state = env.get_full_state()
+                new_full_state = env._low_dim_full_state()
 
                 agent.num_timesteps += 1
 
@@ -146,14 +146,14 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
                 if done:
                     # Episode done.
                     episodes += 1
-                    agent.save_episoed_result(episode_cumulate_reward, episode_length, info['grasp_success'], episodes)
+                    agent.save_episoed_result(episode_cumulate_reward, episode_length, info['is_success'], episodes)
                     episode_cumulate_reward_history.append(episode_cumulate_reward)
                     episode_cumulate_reward = 0
                     episode_length = 0
                     obs = env.reset()
 
             # Train.
-            if agent.pointer >= memory_size:
+            if agent.pointer >= 5 * agent.batch_size:
                 for t_train in range(inter_learn_steps):
                     agent.learn(train_step)
                     train_step += 1
@@ -197,10 +197,13 @@ def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
     env = KukaDiverseObjectEnv(renders=False,
                            isDiscrete=False,
                            maxSteps=max_ep_steps,
+                           blockRandom=0.5,
                            removeHeightHack=True,
-                           numObjects=3, dv=1.0)
+                           low_obs_dim=False,
+                           numObjects=1, dv=1.0)
     kwargs['obs_space'] = env.observation_space
     kwargs['action_space'] = env.action_space
+    kwargs['full_state_space'] = env.full_state_space
 
     if evaluation and rank == 0:
         eval_env = KukaDiverseObjectEnv(renders=isRENDER,

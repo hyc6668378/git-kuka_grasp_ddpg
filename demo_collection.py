@@ -36,12 +36,12 @@ def collect_worker(worker_index):
     i = worker_index * 300
     while 1:
         obs0, done = env.reset(), False
-        f_s0 = env.get_full_state()
+        f_s0 = env._low_dim_full_state()
         for j in range(args.max_ep_steps):
             action = env.demo_policy()
 
             obs1, reward, done, info = env.step(action)
-            f_s1 = env.get_full_state()
+            f_s1 = env._low_dim_full_state()
             demo_transitions = {'obs0': obs0,
                                 'f_s0': f_s0,
                                 'action': action,

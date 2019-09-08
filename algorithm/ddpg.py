@@ -10,7 +10,7 @@ from algorithm.My_toolkit import normalize
 from stable_baselines.common import tf_util
 from stable_baselines.common.mpi_adam import MpiAdam
 
-conv2_ = partial(tc.layers.conv2d, kernel_size=3, stride=2, padding='valid', activation_fn=None)
+conv2_ = partial(tc.layers.conv2d, padding='valid', activation_fn=None)
 
 
 # --------------- hyper parameters -------------
@@ -24,13 +24,14 @@ TAU = 0.001         # soft replacement
 
 class DDPG(object):
     def __init__(self, rank, batch_size, priority, use_n_step=False, n_step_return=5,
-                 LAMBDA_BC = 100, policy_delay=1, use_TD3=False, experiment_name='none', Q_value_range=(-250, 5), **kwargs):
+                 LAMBDA_BC = 100, LAMBDA_predict=50000, policy_delay=1, use_TD3=False, experiment_name='none', Q_value_range=(-250, 5), **kwargs):
 
         self.batch_size = batch_size
         self.use_prioritiy = priority
         self.n_step_return = n_step_return
         self.use_n_step = use_n_step
         self.LAMBDA_BC = LAMBDA_BC
+        self.LAMBDA_predict = LAMBDA_predict
         self.use_TD3 = use_TD3
         self.experiment_name = experiment_name
         self.Q_value_range = Q_value_range # 限制q的范围,防止过估计.
@@ -49,7 +50,7 @@ class DDPG(object):
         self._setup_model(rank, **kwargs)
 
     def _setup_model(self, rank, memory_size, alpha,
-                     obs_space, action_space, noise_target_action, **kwargs):
+                     obs_space, action_space, full_state_space, noise_target_action, **kwargs):
 
         self.graph = tf.Graph()
         with self.graph.as_default():
@@ -65,21 +66,21 @@ class DDPG(object):
             # 定义 placeholders
             self.observe_Input = tf.placeholder(tf.float32, [None]+list(obs_space.shape), name='observe_Input')
             self.observe_Input_ = tf.placeholder(tf.float32, [None]+list(obs_space.shape), name='observe_Input_')
-            self.f_s = tf.placeholder(tf.float32, [None, 15], name='full_state_Input')
-            self.f_s_ = tf.placeholder(tf.float32, [None, 15], name='fill_state_Input_')
+            self.f_s = tf.placeholder(tf.float32, [None]+list(full_state_space.shape), name='full_state_Input')
+            self.f_s_ = tf.placeholder(tf.float32, [None]+list(full_state_space.shape), name='fill_state_Input_')
             self.R = tf.placeholder(tf.float32, [None, 1], 'r')
             self.terminals1 = tf.placeholder(tf.float32, shape=(None, 1), name='terminals1')
             self.ISWeights = tf.placeholder(tf.float32, [None, 1], name='IS_weights')
             self.n_step_steps = tf.placeholder(tf.float32, shape=(None, 1), name='n_step_reached')
             self.q_demo = tf.placeholder(tf.float32, [None, 1], name='Q_of_actions_from_memory')
             self.come_from_demo = tf.placeholder(tf.float32, [None, 1], name='Demo_index')
-            self.action_memory = tf.placeholder(tf.float32, [None, 4], name='actions_from_memory')
+            self.action_memory = tf.placeholder(tf.float32, [None]+list(action_space.shape), name='actions_from_memory')
 
             with tf.variable_scope('obs_rms'):
                 self.obs_rms = RunningMeanStd(shape=obs_space.shape)
 
             with tf.variable_scope('state_rms'):
-                self.state_rms = RunningMeanStd(shape=(15,))
+                self.state_rms = RunningMeanStd(shape=full_state_space.shape)
 
             with tf.name_scope('obs_preprocess'):
                 self.normalized_observe_Input = tf.clip_by_value(
@@ -92,17 +93,17 @@ class DDPG(object):
                 self.normalized_f_s1 = normalize(self.f_s_, self.state_rms)
 
             with tf.variable_scope('Actor'):
-                self.action = self.build_actor(self.normalized_observe_Input,
-                                               scope='eval', trainable=True)
-                self.action_ = self.build_actor(self.normalized_observe_Input_,
-                                                scope='target', trainable=False)
+                self.action, f_s_predict = self.build_actor(self.normalized_observe_Input,
+                                               scope='eval', trainable=True, full_state_dim=full_state_space.shape[0])
+                self.action_, _ = self.build_actor(self.normalized_observe_Input_,
+                                                scope='target', trainable=False,full_state_dim=full_state_space.shape[0])
 
                 # Target policy smoothing, by adding clipped noise to target actions
                 if noise_target_action:
                     epsilon = tf.random_normal(tf.shape(self.action_), stddev=0.007)
                     epsilon = tf.clip_by_value(epsilon, -0.01, 0.01)
                     a2 = self.action_ + epsilon
-                    noised_action_ = tf.clip_by_value(a2, -self.act_limit, self.act_limit)
+                    noised_action_ = tf.clip_by_value(a2, -1, 1)
                 else:
                     noised_action_ = self.action_
 
@@ -209,7 +210,8 @@ class DDPG(object):
                     self.come_from_demo * tf.square(self.action - self.action_memory), 1, keepdims=True)
 
                 L_BC = self.LAMBDA_BC * tf.reduce_sum(action_diffs)
-                a_loss = - tf.reduce_mean(self.q_1) + L_BC
+                auxiliary_predict_loss = self.LAMBDA_predict * tf.reduce_mean( tf.square(f_s_predict - self.f_s))
+                a_loss = - tf.reduce_mean(self.q_1) + L_BC + auxiliary_predict_loss
 
             # Setting optimizer for Actor and Critic
             with tf.variable_scope('Critic_Optimizer'):
@@ -239,7 +241,8 @@ class DDPG(object):
             # TensorBoard summary
             self.a_summary = tf.summary.merge([tf.summary.scalar('a_loss', a_loss, family='actor'),
                                                tf.summary.scalar('L_BC', L_BC, family='actor'),
-                                               tf.summary.scalar('worse_than_demo', worse_than_demo, family='actor')])
+                                               tf.summary.scalar('worse_than_demo', worse_than_demo, family='actor'),
+                                               tf.summary.scalar('auxiliary_predict_loss', auxiliary_predict_loss, family='actor')])
 
             if self.use_TD3:
                 self.c_summary = tf.summary.merge([tf.summary.scalar('c_loss_1', c_loss_1, family='critic'),
@@ -326,7 +329,7 @@ class DDPG(object):
 
         self.writer.add_summary(eval_s, global_step=int(eval_episodes))
 
-    def learn(self, total_steps):
+    def learn(self, learn_step):
         if self.use_prioritiy:
             batch, n_step_batch, percentage = self.memory.sample_rollout(
                 batch_size=self.batch_size,
@@ -401,13 +404,13 @@ class DDPG(object):
 
             self.actor_optimizer.update(actor_grads, LR_A)
             self.sess.run(self.soft_replace_a)
-            self.writer.add_summary(a_s, total_steps)
+            self.writer.add_summary(a_s, learn_step)
 
         # update priority
         if self.use_prioritiy:
             self.memory.update_priorities(batch['idxes'], td_error )
 
-        self.writer.add_summary(c_s, total_steps)
+        self.writer.add_summary(c_s, learn_step)
         self.policy_delay_iterate += 1
 
     def store_transition(self,
@@ -438,20 +441,20 @@ class DDPG(object):
 
         self.pointer += 1
 
-    def build_actor(self, observe_input, scope, trainable):
+    def build_actor(self, observe_input, scope, trainable, full_state_dim):
         fc_a = partial(tf.layers.dense, activation=None, trainable=trainable)
         conv2_a = partial( conv2_, trainable=trainable)
         relu = partial(tf.nn.relu)
         with tf.variable_scope(scope):
             # conv -> relu
-            net = relu(conv2_a( observe_input, 32 ))
-            net = relu(conv2_a( net, 32 ))
-            net = relu(conv2_a( net, 64 ))
-            net = relu(conv2_a( net, 64 ))
-            net = relu(conv2_a( net, 128 ))
-            net = relu(conv2_a( net, 128 ))
+            net = relu(conv2_a( observe_input, 32, 8, 4 ))
+            net = relu(conv2_a( net, 64, 4, 2 ))
+            net = relu(conv2_a( net, 64, 3, 2 ))
+            net = relu(conv2_a( net, 64, 3, 1 ))
 
             net = tf.layers.flatten(net)
+            net = relu(fc_a( net, 128 + full_state_dim ))
+            net, f_s_predict = tf.split( net, [128, full_state_dim], 1)
 
             net = relu(fc_a( net, 128 ))
             net = relu(fc_a( net, 128 ))
@@ -459,12 +462,8 @@ class DDPG(object):
                                   kernel_initializer=tf.initializers.random_uniform(minval=-0.0003,
                                                                                     maxval=0.0003))
             #输出(1,4)
-            # dx a[0] (-0.05,0.05)
-            # dy a[1] (-0.05,0.05)
-            # dz a[2] (-0.05,0.05)
-            # da a[3] (-pi/2,pi/2)
 
-            return action_output
+            return action_output, f_s_predict
 
     def build_critic(self, f_s, a, scope, trainable):
         relu = partial(tf.nn.relu)

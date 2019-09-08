@@ -35,7 +35,8 @@ class KukaDiverseObjectEnv(Kuka):
                  cameraRandom=0,
                  width=128,
                  height=128,
-                 numObjects=5,
+                 numObjects=1,
+                 low_obs_dim=False,
                  isTest=False):
         """Initializes the KukaDiverseObjectEnv.
 
@@ -63,6 +64,7 @@ class KukaDiverseObjectEnv(Kuka):
         """
 
         self._isDiscrete = isDiscrete
+        self.low_obs_dim = low_obs_dim
         self._timeStep = 1. / 240.
         self._urdfRoot = urdfRoot
         self._actionRepeat = actionRepeat
@@ -84,7 +86,12 @@ class KukaDiverseObjectEnv(Kuka):
         self._height = height
         self._numObjects = numObjects
         self._isTest = isTest
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self._width, self._height, 3), dtype=np.uint32)
+        if self.low_obs_dim:
+            self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(self._numObjects*3 + 6,), dtype=np.float32)
+        else:
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self._width, self._height, 3), dtype=np.uint32)
+
+        self.full_state_space = spaces.Box(low=-np.inf, high=np.inf, shape=(self._numObjects*3 + 6,), dtype=np.float32)
 
         if self._renders:
             self.cid = p.connect(p.SHARED_MEMORY)
@@ -111,7 +118,7 @@ class KukaDiverseObjectEnv(Kuka):
         """Environment reset called at the beginning of an episode.
         """
         # Set the camera settings.
-        look = [0.6, 0.4, 0.34]
+        look = [0.6, 0.5, 0.44]
         # look = [0.23, 0.2, 0.54]
         distance = 1.
         # pitch = -56 + self._cameraRandom * np.random.uniform(-3, 3)
@@ -132,7 +139,6 @@ class KukaDiverseObjectEnv(Kuka):
         self._attempted_grasp = False
         self._env_step = 0
         self.terminated = 0
-        self.out_of_range = 0
         p.resetSimulation()
         p.setPhysicsEngineParameter(numSolverIterations=300)
         p.setTimeStep(self._timeStep)
@@ -150,10 +156,15 @@ class KukaDiverseObjectEnv(Kuka):
         urdfList = self._get_random_object(
             self._numObjects, self._isTest)
         self._objectUids = self._randomly_place_objects(urdfList)
-        self._observation = self._get_observation()
-        return  self._observation
 
-    def get_full_state(self):
+        if self.low_obs_dim:
+            obs = self._low_dim_full_state()
+        else:
+            obs = self._get_observation()
+
+        return  obs
+
+    def _low_dim_full_state(self):
         full_state = []
 
         for uid in self._objectUids:
@@ -162,15 +173,14 @@ class KukaDiverseObjectEnv(Kuka):
         full_state.extend( self._kuka.getObservation())
         full_state = np.array(full_state).flatten()
 
-        # full_state.shape = (15,)
         return full_state
 
     def demo_policy(self):
-        fs = self.get_full_state()
+        fs = self._low_dim_full_state()
         # 随便选一个物体
-        fu_state = {'gripper.x': fs[9],
-                    'gripper.y': fs[10],
-                    'gripper.z': fs[11],
+        fu_state = {'gripper.x': fs[-6],
+                    'gripper.y': fs[-5],
+                    'gripper.z': fs[-4],
                     'object1.x': fs[0],
                     'object1.y': fs[1],
                     'object1.z': fs[2]}
@@ -179,11 +189,16 @@ class KukaDiverseObjectEnv(Kuka):
         # move to up of object
         dx = (fu_state['object1.x'] - fu_state['gripper.x'])
         dy = (fu_state['object1.y'] - fu_state['gripper.y'])
-        dz = (fu_state['object1.z'] - fu_state['gripper.z']) + 0.01  # 比物体稍稍高一点点
-        action[0] = np.clip(dx, -0.05, 0.05)
-        action[1] = np.clip(dy, -0.05, 0.05)
-        action[2] = np.clip(dz, -0.05, 0.05)
+        dz = (fu_state['object1.z'] - fu_state['gripper.z']) + 0.3  # 比物体稍稍高一点点
+
+        action[0] = np.clip(dx * 10, -1, 1)
+        action[1] = np.clip(dy * 10, -1, 1)
+        action[2] = np.clip(dz * 10, -1, 1)
         action[3] = 0.0
+
+        if dx<5e-5 and dy <5e-5:
+            action = np.array([0.0, 0.0, -0.3, 0.0], dtype=np.float32)
+
         return action
 
     def _randomly_place_objects(self, urdfList):
@@ -285,11 +300,13 @@ class KukaDiverseObjectEnv(Kuka):
         self._env_step += 1
         state = p.getLinkState(self._kuka.kukaUid, self._kuka.kukaEndEffectorIndex)
         current_EndEffectorPos = state[0]
-        self._kuka.endEffectorPos[0] = current_EndEffectorPos[0] + action[0]
 
-        self._kuka.endEffectorPos[1] = current_EndEffectorPos[1] + action[1]
+        # clip the end-effector with in a legal range.
+        self._kuka.endEffectorPos[0] = np.clip(current_EndEffectorPos[0] + action[0], 0.45, 0.7)
 
-        self._kuka.endEffectorPos[2] = current_EndEffectorPos[2] + action[2] + 0.02  # gravity offset
+        self._kuka.endEffectorPos[1] = np.clip(current_EndEffectorPos[1] + action[1], -0.22, 0.22)
+
+        self._kuka.endEffectorPos[2] = np.clip(current_EndEffectorPos[2] + action[2], 0.04, 0.3) + 0.02  # gravity offset
 
         self.current_a += action[3]  # angel
         for _ in range(self._actionRepeat):
@@ -329,35 +346,27 @@ class KukaDiverseObjectEnv(Kuka):
                     finger_angle = 0
 
             self._attempted_grasp = True
-        observation = self._get_observation()
+        if self.low_obs_dim:
+            obs = self._low_dim_full_state()
+        else:
+            obs = self._get_observation()
         done = self._termination()
         reward = self._reward()
         debug = {
-            'grasp_success': self._graspSuccess
+            'is_success': self._graspSuccess
         }
-        return observation, reward, done, debug
+        return obs, reward, done, debug
 
     def _reward(self):
         """
         gripper out of range   -1
         Prone to object bonus  - dis_to_nearest_object
         grasp success          +2
-        attempted_grasp_but_not_success 0
+        attempted_grasp_but_not_success -1
         """
         state = p.getLinkState(self._kuka.kukaUid,
                                self._kuka.kukaEndEffectorIndex)
         end_effector_pos = state[0]
-
-        # out_of_range
-        out_of_range = False
-        if (end_effector_pos[0] < 0.537 - 0.25) or (end_effector_pos[0] > 0.537 + 0.25):
-            out_of_range = True
-        elif (end_effector_pos[1] < -0.25) or (end_effector_pos[1] > 0.25):
-            out_of_range = True
-        elif (end_effector_pos[2] < -0.) or (end_effector_pos[2] > 0.5 + 0.3):
-            out_of_range = True
-        if out_of_range:
-            return -1
 
         self._graspSuccess = 0
         dis_list = []
@@ -371,15 +380,15 @@ class KukaDiverseObjectEnv(Kuka):
 
             # If any block is above height, return reward.
             if pos[2] > 0.05:
-                self._graspSuccess += 1
-                reward = 2
+                self._graspSuccess = 1
+                reward = 4
                 return reward
         dis_list = np.array(dis_list)
         min_dis_from_EndEffector_to_object = np.min(dis_list[:, 1])
         prone_to_object_bonus = 0.2 - min_dis_from_EndEffector_to_object
 
         if self._attempted_grasp:
-            reward = 0
+            reward = -2.0
         else:
             reward = prone_to_object_bonus
 
@@ -389,7 +398,7 @@ class KukaDiverseObjectEnv(Kuka):
         """Terminates the episode if we have tried to grasp or if we are above
         maxSteps steps or gripper out of range.
         """
-        return self._attempted_grasp or (self._env_step >= self._maxSteps) or self.out_of_range
+        return self._attempted_grasp or (self._env_step >= self._maxSteps)
 
     def _get_random_object(self, num_objects, test):
         """Randomly choose an object urdf from the random_urdfs directory.
