@@ -17,7 +17,7 @@ def common_arg_parser():
 
     # common argument
     parser.add_argument('--memory_size',    type=int, default=2019, help="MEMORY_CAPACITY. default = 2019")
-    parser.add_argument('--inter_learn_steps', type=int, default=3, help="一个step中agent.learn()的次数. default = 3")
+    parser.add_argument('--inter_learn_steps', type=int, default=50, help="一个step中agent.learn()的次数. default = 50")
     parser.add_argument('--experiment_name',   type=str, default='no_name', help="实验名字")
     parser.add_argument('--batch_size',    type=int, default=16, help="batch_size. default = 16")
     parser.add_argument('--max_ep_steps',    type=int, default=20, help="一个episode最大长度. default = 50")
@@ -25,8 +25,9 @@ def common_arg_parser():
     parser.add_argument('--isRENDER',  action="store_true", help="Is render GUI in evaluation?")
     parser.add_argument('--max_epochs', type=int, default=int(1e+4), help="The max_epochs of whole training. default = 10000")
     parser.add_argument("--noise_target_action", help="noise target_action for Target policy smoothing", action="store_true")
-    parser.add_argument("--nb_rollout_steps", type=int, default=3, help="The timestep of whole training. default = 5")
+    parser.add_argument("--nb_rollout_steps", type=int, default=100, help="The timestep of rollout. default = 100")
     parser.add_argument("--evaluation", help="Evaluate model", action="store_true")
+    parser.add_argument("--LAMBDA_predict", type=float, default=0.5, help="auxiliary predict weight. default = 0.5")
 
     # priority memory replay
     parser.add_argument("-p", "--priority", action="store_true", help="priority memory replay")
@@ -100,7 +101,7 @@ def preTrain(agent, PreTrain_STEPS):
     print(" PreTraining completed.")
 
 def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
-          nb_rollout_steps=5, inter_learn_steps=5, **kwargs):
+          nb_rollout_steps=100, inter_learn_steps=50, **kwargs):
 
     # OU noise
     Noise = OUNoise(size=env.action_space.shape[0], mu=0, theta=0.05, sigma=0.25)
@@ -151,6 +152,7 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
                     episode_cumulate_reward = 0
                     episode_length = 0
                     obs = env.reset()
+                    Noise.reset()
 
             # Train.
             if agent.pointer >= 5 * agent.batch_size:
@@ -159,7 +161,6 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
                     train_step += 1
 
             # Noise decay
-            Noise.theta = np.linspace(0.05, 0.0, max_epochs)[epoch]
             Noise.sigma = np.linspace(0.25, 0.0, max_epochs)[epoch]
             if turn_beta:
                 agent.beta = np.linspace(0.6, 1.0, max_epochs)[epoch]

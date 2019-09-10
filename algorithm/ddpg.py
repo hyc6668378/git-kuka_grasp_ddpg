@@ -24,7 +24,7 @@ TAU = 0.001         # soft replacement
 
 class DDPG(object):
     def __init__(self, rank, batch_size, priority, use_n_step=False, n_step_return=5,
-                 LAMBDA_BC = 100, LAMBDA_predict=50000, policy_delay=1, use_TD3=False, experiment_name='none', Q_value_range=(-250, 5), **kwargs):
+                 LAMBDA_BC = 100, LAMBDA_predict=0.5, policy_delay=1, use_TD3=False, experiment_name='none', Q_value_range=(-250, 5), **kwargs):
 
         self.batch_size = batch_size
         self.use_prioritiy = priority
@@ -62,7 +62,7 @@ class DDPG(object):
                 from algorithm.memory import Memory
                 self.memory = Memory(limit=memory_size, action_shape=action_space.shape,
                                      observation_shape=obs_space.shape,
-                                     full_state_shape=(15,))
+                                     full_state_shape=full_state_space.shape)
             # 定义 placeholders
             self.observe_Input = tf.placeholder(tf.float32, [None]+list(obs_space.shape), name='observe_Input')
             self.observe_Input_ = tf.placeholder(tf.float32, [None]+list(obs_space.shape), name='observe_Input_')
@@ -84,9 +84,9 @@ class DDPG(object):
 
             with tf.name_scope('obs_preprocess'):
                 self.normalized_observe_Input = tf.clip_by_value(
-                    normalize(self.observe_Input, self.obs_rms), -10., 10.)
+                    normalize(self.observe_Input, self.obs_rms), -5., 5.)
                 self.normalized_observe_Input_ = tf.clip_by_value(
-                    normalize(self.observe_Input_, self.obs_rms), -10., 10.)
+                    normalize(self.observe_Input_, self.obs_rms), -5., 5.)
 
             with tf.name_scope('state_preprocess'):
                 self.normalized_f_s0 = normalize(self.f_s, self.state_rms)
@@ -447,8 +447,8 @@ class DDPG(object):
         relu = partial(tf.nn.relu)
         with tf.variable_scope(scope):
             # conv -> relu
-            net = relu(conv2_a( observe_input, 32, 8, 4 ))
-            net = relu(conv2_a( net, 64, 4, 2 ))
+            net = relu(conv2_a( observe_input, 32, 7, 4 ))
+            net = relu(conv2_a( net, 64, 5, 2 ))
             net = relu(conv2_a( net, 64, 3, 2 ))
             net = relu(conv2_a( net, 64, 3, 1 ))
 

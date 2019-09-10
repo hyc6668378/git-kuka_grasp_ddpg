@@ -118,15 +118,18 @@ class KukaDiverseObjectEnv(Kuka):
         """Environment reset called at the beginning of an episode.
         """
         # Set the camera settings.
-        look = [0.6, 0.5, 0.44]
-        # look = [0.23, 0.2, 0.54]
+
+        # look = [0.6, 0.5, 0.44]
+        # pitch = -50
+        # yaw = -185
+        # roll = 10
+
+        look = [0.23, 0.2, 0.54]
+        pitch = -56 + self._cameraRandom * np.random.uniform(-3, 3)
+        yaw = 245 + self._cameraRandom * np.random.uniform(-3, 3)
+        roll = 0
+
         distance = 1.
-        # pitch = -56 + self._cameraRandom * np.random.uniform(-3, 3)
-        pitch = -50
-        yaw = -185
-        roll = 10
-        # yaw = 245 + self._cameraRandom * np.random.uniform(-3, 3)
-        # roll = 0
         self._view_matrix = p.computeViewMatrixFromYawPitchRoll(
             look, distance, yaw, pitch, roll, 2)
         fov = 20. + self._cameraRandom * np.random.uniform(-2, 2)

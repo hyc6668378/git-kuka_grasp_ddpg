@@ -1,9 +1,7 @@
 #!/bin/bash
-mpirun -np 1 python run.py --batch_size 64 \
- --experiment_name 9_8_20_39 \
- --max_epochs 10000 \
- --priority \
+mpirun -np 4 python run.py --batch_size 64 \
+ --experiment_name 9_10_12_10 \
+ --max_epochs 1000 \
  --max_ep_steps 100 \
- --inter_learn_steps 10 \
- --nb_rollout_steps 1 &&
+ --LAMBDA_predict 0.5 &&
 echo "done"
