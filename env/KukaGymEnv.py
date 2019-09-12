@@ -36,7 +36,8 @@ class KukaDiverseObjectEnv(Kuka):
                  width=128,
                  height=128,
                  numObjects=1,
-                 low_obs_dim=False,
+                 use_low_dim_obs=False,
+                 use_segmentation_Mask=False,
                  isTest=False):
         """Initializes the KukaDiverseObjectEnv.
 
@@ -64,7 +65,8 @@ class KukaDiverseObjectEnv(Kuka):
         """
 
         self._isDiscrete = isDiscrete
-        self.low_obs_dim = low_obs_dim
+        self.use_low_dim_obs = use_low_dim_obs
+        self.use_segmentation_Mask = use_segmentation_Mask
         self._timeStep = 1. / 240.
         self._urdfRoot = urdfRoot
         self._actionRepeat = actionRepeat
@@ -86,8 +88,10 @@ class KukaDiverseObjectEnv(Kuka):
         self._height = height
         self._numObjects = numObjects
         self._isTest = isTest
-        if self.low_obs_dim:
+        if self.use_low_dim_obs:
             self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(self._numObjects*3 + 6,), dtype=np.float32)
+        elif self.use_segmentation_Mask:
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self._width, self._height, 1), dtype=np.uint32)
         else:
             self.observation_space = spaces.Box(low=0, high=255, shape=(self._width, self._height, 3), dtype=np.uint32)
 
@@ -160,7 +164,7 @@ class KukaDiverseObjectEnv(Kuka):
             self._numObjects, self._isTest)
         self._objectUids = self._randomly_place_objects(urdfList)
 
-        if self.low_obs_dim:
+        if self.use_low_dim_obs:
             obs = self._low_dim_full_state()
         else:
             obs = self._get_observation()
@@ -244,8 +248,12 @@ class KukaDiverseObjectEnv(Kuka):
                                    viewMatrix=self._view_matrix,
                                    projectionMatrix=self._proj_matrix)
         rgb = img_arr[2]
+        segmentation = img_arr[4]
         np_img_arr = np.reshape(rgb, (self._height, self._width, 4))
-        return np_img_arr[:, :, :3]
+        if self.use_segmentation_Mask:
+            return segmentation[:, :, np.newaxis]
+        else:
+            return np_img_arr[:, :, :3]
 
     def _step(self, action):
         """Environment step.
@@ -349,7 +357,7 @@ class KukaDiverseObjectEnv(Kuka):
                     finger_angle = 0
 
             self._attempted_grasp = True
-        if self.low_obs_dim:
+        if self.use_low_dim_obs:
             obs = self._low_dim_full_state()
         else:
             obs = self._get_observation()
@@ -362,7 +370,6 @@ class KukaDiverseObjectEnv(Kuka):
 
     def _reward(self):
         """
-        gripper out of range   -1
         Prone to object bonus  - dis_to_nearest_object
         grasp success          +2
         attempted_grasp_but_not_success -1
@@ -384,7 +391,7 @@ class KukaDiverseObjectEnv(Kuka):
             # If any block is above height, return reward.
             if pos[2] > 0.05:
                 self._graspSuccess = 1
-                reward = 4
+                reward = 2
                 return reward
         dis_list = np.array(dis_list)
         min_dis_from_EndEffector_to_object = np.min(dis_list[:, 1])
@@ -393,7 +400,7 @@ class KukaDiverseObjectEnv(Kuka):
         if self._attempted_grasp:
             reward = -2.0
         else:
-            reward = prone_to_object_bonus
+            reward = 0
 
         return reward
 

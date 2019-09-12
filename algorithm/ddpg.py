@@ -235,7 +235,10 @@ class DDPG(object):
                 self._initialize(self.sess)
 
             # 保存模型
-            var_list = tf.trainable_variables()
+            var_list = tf.global_variables()
+            print("var_list!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+            for v in var_list:
+                print(v)
             self.saver = tf.train.Saver(var_list=var_list, max_to_keep=1)
             self.writer = tf.summary.FileWriter("logs/" + self.experiment_name + "/DDPG_"+ str(rank), self.graph)
             # TensorBoard summary

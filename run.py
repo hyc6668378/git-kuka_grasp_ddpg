@@ -4,7 +4,6 @@ from algorithm.ddpg import DDPG
 from algorithm.OUNoise import OUNoise
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 import argparse
 import tensorflow as tf
 import random
@@ -28,6 +27,7 @@ def common_arg_parser():
     parser.add_argument("--nb_rollout_steps", type=int, default=100, help="The timestep of rollout. default = 100")
     parser.add_argument("--evaluation", help="Evaluate model", action="store_true")
     parser.add_argument("--LAMBDA_predict", type=float, default=0.5, help="auxiliary predict weight. default = 0.5")
+    parser.add_argument("--use_segmentation_Mask", help="Evaluate model", action="store_true")
 
     # priority memory replay
     parser.add_argument("-p", "--priority", action="store_true", help="priority memory replay")
@@ -76,38 +76,44 @@ def plot(succ_list, steps_list):
     plt.ylabel('success rate')
     plt.savefig('result/'+args.experiment_name+'/'+args.experiment_name+'.png')
 
-def demo_collect(agent, Demo_CAPACITY):
+def demo_collect(agent, Demo_CAPACITY, use_segmentation_Mask):
     print("\n Demo Collecting...")
+    if use_segmentation_Mask:
+        demo_dir = 'demo_with_segm/'
+    else:
+        demo_dir = 'all_demo/'
 
-    for i in tqdm(range(Demo_CAPACITY)):
-        demo_tran_file_path = 'all_demo/demo%d.npy' % (i)
-        transition = np.load(demo_tran_file_path, allow_pickle=True)
-        transition = transition.tolist()
-        agent.store_transition(full_state0=transition['f_s0'],
-                               obs0=transition['obs0'],
-                               action=transition['action'],
-                               reward=transition['reward'],
-                               full_state1=transition['f_s1'],
-                               obs1=transition['obs1'],
-                               terminal1=transition['terminal1'],
-                               demo = True)
+    with agent.sess.as_default(), agent.graph.as_default():
+        for i in range(Demo_CAPACITY):
+            demo_tran_file_path = demo_dir+'demo%d.npy' % (i)
+            transition = np.load(demo_tran_file_path, allow_pickle=True)
+            transition = transition.tolist()
+            agent.store_transition(full_state0=transition['f_s0'],
+                                   obs0=transition['obs0'],
+                                   action=transition['action'],
+                                   reward=transition['reward'],
+                                   full_state1=transition['f_s1'],
+                                   obs1=transition['obs1'],
+                                   terminal1=transition['terminal1'],
+                                   demo = True)
     print(" Demo Collection completed.")
 
 def preTrain(agent, PreTrain_STEPS):
     print("\n PreTraining ...")
-    for _ in tqdm(range(PreTrain_STEPS)):
-        agent.learn()
+    with agent.sess.as_default(), agent.graph.as_default():
+        for t_step in range(PreTrain_STEPS):
+            agent.learn(t_step)
 
     print(" PreTraining completed.")
 
-def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
+def train(agent, env, eval_env, max_epochs, rank, PreTrain_STEPS, turn_beta,
           nb_rollout_steps=100, inter_learn_steps=50, **kwargs):
 
     # OU noise
     Noise = OUNoise(size=env.action_space.shape[0], mu=0, theta=0.05, sigma=0.25)
 
     assert np.all(np.abs(env.action_space.low) == env.action_space.high)
-    print('Process_%d has been rollout!'%(rank))
+    print('Process_%d start rollout!'%(rank))
     with agent.sess.as_default(), agent.graph.as_default():
         obs = env.reset()
         full_state = env._low_dim_full_state()
@@ -118,7 +124,7 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
         episode_cumulate_reward_history = []
         episode_cumulate_reward = 0
         eval_episodes = 0
-        train_step = 0
+        train_step = PreTrain_STEPS
 
         for epoch in range(int(max_epochs)):
             # Perform rollouts.
@@ -167,23 +173,29 @@ def train(agent, env, eval_env, max_epochs, rank, memory_size, turn_beta,
 
             # Evaluate. The frequency of evaluation is limited as below
             if eval_env is not None and epoch % 10 == 0:
+                print('\neval_episodes:', eval_episodes)
                 eval_episode_cumulate_reward = 0.
                 eval_episode_length = 0
 
                 eval_obs, eval_done = eval_env.reset(), False
                 while not eval_done:
                     a = agent.pi(eval_obs)
+                    print("eval_action:",a)
                     eval_obs, r, eval_done, eval_info = env.step( a )
-                    eval_episode_cumulate_reward += 0.99 * r
+                    eval_episode_cumulate_reward = 0.99 * eval_episode_cumulate_reward + r
                     eval_episode_length += 1
                 eval_episodes += 1
                 agent.save_eval_episoed_result(eval_episode_cumulate_reward, eval_episode_length,
-                                               eval_info['grasp_success'], eval_episodes)
+                                               eval_info['is_success'], eval_episodes)
+                if eval_info['is_success']:
+                    print('Success!')
+                else:
+                    print('Fail...')
 
         return agent
 
 def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
-         use_DDPGfD, Demo_CAPACITY, PreTrain_STEPS,
+         use_DDPGfD, Demo_CAPACITY, PreTrain_STEPS, use_segmentation_Mask,
          **kwargs):
 
     # 生成实验文件夹
@@ -196,32 +208,37 @@ def main(experiment_name, seed, max_epochs, evaluation, isRENDER, max_ep_steps,
     print('\nrank {}: seed={}'.format(rank, seed))
 
     env = KukaDiverseObjectEnv(renders=False,
-                           isDiscrete=False,
-                           maxSteps=max_ep_steps,
-                           blockRandom=0.5,
-                           removeHeightHack=True,
-                           low_obs_dim=False,
-                           numObjects=1, dv=1.0)
+                               isDiscrete=False,
+                               maxSteps=max_ep_steps,
+                               blockRandom=0.4,
+                               removeHeightHack=True,
+                               use_low_dim_obs=False,
+                               use_segmentation_Mask=use_segmentation_Mask,
+                               numObjects=1, dv=1.0)
     kwargs['obs_space'] = env.observation_space
     kwargs['action_space'] = env.action_space
     kwargs['full_state_space'] = env.full_state_space
 
     if evaluation and rank == 0:
         eval_env = KukaDiverseObjectEnv(renders=isRENDER,
-                           isDiscrete=False,
-                           maxSteps=max_ep_steps,
-                           removeHeightHack=True,
-                           numObjects=3, dv=1.0)
+                                        isDiscrete=False,
+                                        maxSteps=max_ep_steps,
+                                        blockRandom=0.4,
+                                        removeHeightHack=True,
+                                        use_low_dim_obs=False,
+                                        use_segmentation_Mask=use_segmentation_Mask,
+                                        numObjects=1, dv=1.0)
     else:
         eval_env = None
 
     agent = DDPG(rank, **kwargs, experiment_name = experiment_name)
 
     if use_DDPGfD:
-        demo_collect( agent, Demo_CAPACITY )
+        demo_collect( agent, Demo_CAPACITY, use_segmentation_Mask )
         preTrain( agent, PreTrain_STEPS )
 
-    agent_trained = train( agent, env, eval_env, max_epochs, rank, **kwargs )
+    agent_trained = train( agent, env, eval_env, max_epochs, rank, PreTrain_STEPS, **kwargs )
+
     if rank == 0:
         agent_trained.Save()
 

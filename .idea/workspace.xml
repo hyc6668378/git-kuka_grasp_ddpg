@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="增加 DDPGfD">
+    <list default="true" id="4aa264a2-073f-49c4-829f-456f9025c5c6" name="Default Changelist" comment="修改为稀疏回报，分别用raw pixel和语义掩码作为state训练，其中语义掩码+预测误差反馈 效果最好">
+      <change afterPath="$PROJECT_DIR$/test.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/algorithm/OUNoise.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/OUNoise.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algorithm/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithm/ddpg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo_collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/demo_collection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/KukaGymEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/KukaGymEnv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_bash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_bash.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_bash2.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_bash3.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_segment.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,6 +32,7 @@
   </component>
   <component name="ProjectId" id="1PzqKpibBLB32NVDxdSEHoI0FY6" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="ignore_missing_gitignore" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../stable-baselines" />
@@ -98,6 +104,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="选action 用online actor网络." />
     <MESSAGE value="增加 DDPGfD" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加 DDPGfD" />
+    <MESSAGE value="修改为稀疏回报，分别用raw pixel和语义掩码作为state训练，其中语义掩码+预测误差反馈 效果最好" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改为稀疏回报，分别用raw pixel和语义掩码作为state训练，其中语义掩码+预测误差反馈 效果最好" />
   </component>
 </project>
